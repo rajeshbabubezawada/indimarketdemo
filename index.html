@@ -1,276 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgriLink Bharat - Demo</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ffb6c1, #ffa500, #d291ff);
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      text-align: center;
-      padding-top: 2rem;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MarketHive 🌾</title>
+<style>
+  :root { --primary:#ffa500; --lav:#d291ff; --white:#fff; --text:#333; --green:#28a745; --red:#d9534f; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: linear-gradient(135deg, #ffb6c1, #ffa500, #d291ff);
+    color:#fff; text-align:center; padding-top:2rem;
+  }
+  /* Only the main app gets dimmed/opacity changes */
+  #appRoot { transition: filter .25s, opacity .25s; }
 
-    header {
-      background-color: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-      padding: 1rem 2rem;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 2rem;
-    }
+  header { background: rgba(255,255,255,.12); padding:1rem 2rem; border-radius:20px; margin:0 auto 1.25rem; backdrop-filter: blur(8px); width: min(100%, 900px); }
+  h1 { margin:0; font-size:2rem; }
+  p.lead { margin:.4rem 0 0; opacity:.95; }
 
-    h1 {
-      font-size: 2rem;
-      margin: 0;
-      color: white;
-      letter-spacing: 1px;
-    }
+  /* Buttons */
+  button, .btn {
+    background:#fff; color:var(--lav); border:none; padding:.7rem 1.2rem; border-radius:25px;
+    cursor:pointer; font-weight:700; margin:.4rem; transition:.2s;
+  }
+  button:hover, .btn:hover { background:var(--primary); color:#fff; }
 
-    .card-container {
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+  /* Search + cards */
+  .search-bar-container { display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem; margin: 1rem auto; width:min(100%, 900px); }
+  .search-input { border:none; border-radius:15px; padding:.65rem 1rem; width:260px; outline:none; }
+  .card-container { display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; width:min(100%, 1100px); margin:0 auto; }
+  .card {
+    background:#fff; color:#333; border-radius:18px; padding:1rem; width:250px;
+    box-shadow:0 6px 16px rgba(0,0,0,.18); cursor:pointer; transition:transform .2s, box-shadow .2s;
+  }
+  .card:hover { transform: translateY(-2px) scale(1.03); box-shadow:0 10px 22px rgba(0,0,0,.25); }
+  .muted { opacity:.8; }
 
-    .card {
-      background-color: white;
-      color: #333;
-      border-radius: 20px;
-      padding: 1.5rem;
-      width: 250px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
+  /* Forms */
+  form.panel {
+    background: rgba(255,255,255,.2); padding:1rem; border-radius:15px; margin:1rem auto;
+    width:min(100%, 700px); display:none; box-shadow:0 4px 12px rgba(0,0,0,.15);
+  }
+  .row { display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; }
+  input, select { border:none; border-radius:10px; padding:.55rem .7rem; outline:none; width: min(320px, 90%); }
 
-    .card:hover {
-      transform: scale(1.05) rotate(-1deg);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    }
+  /* Modal */
+  #infoModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.72); justify-content:center; align-items:center; z-index:400; }
+  #modalContent {
+    background:#fff; color:#333; border-radius:20px; padding:1.6rem; width:min(92%, 760px);
+    text-align:center; box-shadow:0 16px 36px rgba(0,0,0,.38); position:relative; animation: pop .25s ease;
+  }
+  #closeModal { position:absolute; top:10px; right:12px; background:none; border:none; font-size:1.6rem; color:#555; cursor:pointer; }
+  .status-green { color:var(--green); font-weight:700; }
+  .status-red { color:var(--red); font-weight:700; }
+  .modal-actions { display:flex; justify-content:center; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
+  .modal-actions a { text-decoration:none; padding:.6rem 1rem; border-radius:22px; color:#fff; background:var(--primary); font-weight:700; }
+  .modal-actions a:hover { background:var(--lav); }
+  @keyframes pop { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
 
-    button {
-      background-color: #fff;
-      color: #d291ff;
-      border: none;
-      padding: 0.7rem 1.2rem;
-      border-radius: 25px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-      margin: 0.3rem;
-    }
+  /* Sidebar (centered, Brightness fully visible) */
+  #rightSidebar {
+    position: fixed;
+    top:50%; right:-260px; transform: translateY(-50%);
+    width:260px; max-height:85vh;
+    background: linear-gradient(180deg,#ffb6c1cc,#d291ffcc,#ffa500cc);
+    border-radius:20px 0 0 20px; box-shadow:-4px 0 12px rgba(0,0,0,.3);
+    padding:16px 12px 20px; transition:right .28s ease; z-index:550;
+    display:flex; flex-direction:column; justify-content:flex-start; overflow-y:auto; scrollbar-width: thin;
+  }
+  #rightSidebar.open { right:0; }
 
-    button:hover {
-      background-color: #ffa500;
-      color: #fff;
-    }
+  /* Always-visible handle */
+  #sidebarHandle {
+    position: fixed; right:0; top:50%; transform: translateY(-50%);
+    width:36px; height:90px; background: linear-gradient(180deg, var(--primary), #ff66b2);
+    border-radius:16px 0 0 16px; box-shadow:0 0 14px rgba(255,255,255,.55); cursor:pointer;
+    z-index:600; animation: glow 2s ease-in-out infinite alternate;
+  }
+  #sidebarHandle.docked { right:260px; }
+  @keyframes glow { from { box-shadow:0 0 10px var(--primary); } to { box-shadow:0 0 20px #ff66b2; } }
+  .sidebar-btn {
+    background: rgba(255,255,255,.95); color:#333; border:none; border-radius:12px;
+    font-weight:700; padding:10px; margin:8px 0; cursor:pointer; transition:.2s; width:100%;
+  }
+  .sidebar-btn:hover { background:var(--primary); color:#fff; transform: translateX(-3px); }
+  .slider-panel { display:none; background: rgba(255,255,255,.95); padding:12px; border-radius:10px; margin:4px 0 10px; }
+  .slider-panel input[type=range]{ width:100%; accent-color: var(--primary); }
+  .notif-off { text-decoration: line-through; opacity:.7; }
 
-    footer {
-      margin-top: 3rem;
-      font-size: 0.9rem;
-      opacity: 0.9;
-    }
-
-    form {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 1rem 2rem;
-      border-radius: 15px;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      display: none;
-    }
-
-    input {
-      border: none;
-      border-radius: 10px;
-      padding: 0.5rem 1rem;
-      margin: 0.4rem;
-      outline: none;
-    }
-
-    #searchBar {
-      border: none;
-      border-radius: 15px;
-      padding: 0.6rem 1rem;
-      width: 60%;
-      margin-bottom: 1rem;
-      outline: none;
-    }
-  </style>
+  /* Help window */
+  #helpWindow {
+    position: fixed; background:#fff; color:#333; border-radius:12px; padding:14px 16px;
+    box-shadow:0 8px 24px rgba(0,0,0,.25); width:340px; max-height:70vh; overflow-y:auto;
+    display:none; z-index:650; animation: fadeIn .25s ease;
+  }
+  #helpWindow h3 { color: var(--primary); margin:.2rem 0 .6rem; }
+  #helpWindow ul { text-align:left; padding-left:18px; margin:0; }
+  #helpWindow li { margin-bottom:8px; }
+  @keyframes fadeIn { from{opacity:0; transform:scale(.97);} to{opacity:1; transform:scale(1);} }
+</style>
 </head>
 <body>
+
+<!-- Everything that should dim/opacity-change lives inside #appRoot -->
+<div id="appRoot">
   <header>
-    <h1> MarketHive 🌾 </h1>
-    <p>Connecting Farmers, Industries & Buyers for a Self-Reliant India</p>
+    <h1>MarketHive 🌾</h1>
+    <p class="lead">Connecting Farmers, Buyers & Industries</p>
   </header>
 
+  <!-- HOME -->
   <div id="homeView">
-    <button onclick="openFarmersView()">Farmers / Small-Scale Industrialists</button>
-    <button onclick="openBuyersView()">Buyers</button>
+    <button id="btnFarmers">Farmers / Small-Scale Industrialists</button>
+    <button id="btnBuyers">Buyers</button>
   </div>
 
-  <!-- FARMERS VIEW -->
+  <!-- FARMER VIEW (Farmers see Buyers) -->
   <div id="farmerView" style="display:none;">
-    <button onclick="showFarmerForm()">+ Register New Product</button>
-	<form id="farmerForm">
-      <h3>Register New Farmer Product</h3>
-      <input type="text" id="farmerName" placeholder="Name" required>
-      <input type="text" id="farmerLocation" placeholder="Location" required>
-      <input type="text" id="farmerProduct" placeholder="Product" required>
-      <input type="text" id="farmerContact" placeholder="Contact" required>
-      <button type="button" onclick="addFarmer()">Add Product</button>
+    <button id="toggleFarmerForm">+ Register New Product</button>
+    <form id="farmerForm" class="panel">
+      <h3>Register New Product</h3>
+      <div class="row">
+        <input id="farmerName" placeholder="Name" required>
+        <input id="farmerLocation" placeholder="Location" required>
+        <input id="farmerProduct" placeholder="Product" required>
+        <input id="farmerContact" placeholder="Contact" required>
+        <input id="minQty" placeholder="Minimum Quantity (optional)">
+        <input id="maxQty" placeholder="Maximum Quantity (optional)">
+        <input id="fertilizers" placeholder="Fertilizers Used (optional)">
+        <input id="materials" placeholder="Materials Used (optional)">
+        <select id="availability">
+          <option value="Available">Available</option>
+          <option value="Out of Stock">Out of Stock</option>
+        </select>
+      </div>
+      <button type="button" id="addFarmerBtn">Add Product</button>
     </form>
-    <div id="buyerForFarmerContainer">
-      <input type="text" id="searchBuyerForFarmer" placeholder="Search Buyer Requirements..." onkeyup="searchBuyerForFarmer()">
-      <div class="card-container" id="buyerForFarmerList"></div>
+
+    <div class="search-bar-container">
+      <input id="buyerReqQuery" class="search-input" placeholder="Search Buyer Requirements...">
+      <input id="buyerLocQuery" class="search-input" placeholder="Search by Location...">
     </div>
-    
-    <button onclick="goHome()">⬅ Back</button>
+    <div class="card-container" id="buyerForFarmerList"></div>
+    <button class="btn" id="backFromFarmer">⬅ Back</button>
   </div>
 
-  <!-- BUYERS VIEW -->
+  <!-- BUYER VIEW (Buyers see Farmers) -->
   <div id="buyerView" style="display:none;">
-    <button onclick="showBuyerForm()">+ Register New Requirement</button>
-	<form id="buyerForm">
+    <button id="toggleBuyerForm">+ Register New Requirement</button>
+    <form id="buyerForm" class="panel">
       <h3>Register New Buyer Requirement</h3>
-      <input type="text" id="buyerName" placeholder="Buyer Name" required>
-      <input type="text" id="buyerLocation" placeholder="Location" required>
-      <input type="text" id="buyerNeed" placeholder="Need (Product Type)" required>
-      <input type="text" id="buyerContact" placeholder="Contact" required>
-      <button type="button" onclick="addBuyer()">Add Requirement</button>
+      <div class="row">
+        <input id="buyerName" placeholder="Buyer Name" required>
+        <input id="buyerLocation" placeholder="Location" required>
+        <input id="buyerNeed" placeholder="Need (Product Type)" required>
+        <input id="buyerContact" placeholder="Contact" required>
+        <input id="minQtyBuyer" placeholder="Minimum Quantity (optional)">
+        <input id="maxQtyBuyer" placeholder="Maximum Quantity (optional)">
+        <input id="materialsBuyer" placeholder="Preferred Materials (optional)">
+        <select id="availabilityBuyer">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <button type="button" id="addBuyerBtn">Add Requirement</button>
     </form>
-    <div id="farmerForBuyerContainer">
-      <input type="text" id="searchFarmerForBuyer" placeholder="Search Farmer Products..." onkeyup="searchFarmerForBuyer()">
-      <div class="card-container" id="farmerForBuyerList"></div>
+
+    <div class="search-bar-container">
+      <input id="farmerProdQuery" class="search-input" placeholder="Search Farmer Products...">
+      <input id="farmerLocQuery" class="search-input" placeholder="Search by Location...">
     </div>
-    
-    <button onclick="goHome()">⬅ Back</button>
+    <div class="card-container" id="farmerForBuyerList"></div>
+    <button class="btn" id="backFromBuyer">⬅ Back</button>
   </div>
 
-  <footer>
-    <p>Demo App • Made for Viksit Bharat Buildathon 2025</p>
-  </footer>
+  <!-- MODAL -->
+  <div id="infoModal"><div id="modalContent"></div></div>
 
-  <script>
-    let farmers = [
-      { name: 'Ravi Kumar', location: 'Karnataka', product: 'Tomatoes', contact: '9876543210' },
-      { name: 'Lakshmi Devi', location: 'Karnataka', product: 'Mangoes', contact: '9123456789' },
-      { name: 'Mahesh Gowda', location: 'Karnataka', product: 'Sugarcane', contact: '9988776655' },
-	  { name: 'lavnya', location: 'Karnataka', product: 'onions', contact: '7654790873' },
-	  { name: 'Suresh', location: 'Karnataka', product: 'potatoes', contact: '2988587610' },
-	  { name: 'krithika', location: 'Karnataka', product: 'Carrots', contact: '6605482390' },
-    ];
+  <footer><p>Demo App • Made for Viksit Bharat Buildathon 2025</p></footer>
+</div><!-- /#appRoot -->
 
-    let buyers = [
-      { name: 'FreshMart Wholesalers', location: 'Karnataka', need: 'Tomatoes', contact: '8888999977' },
-      { name: 'AgroFoods Pvt Ltd', location: 'Karnataka', need: 'Sugarcane', contact: '7777888899' },
-	  { name: 'Rajesh Wholsalers', location: 'Karnataka', need: 'clay pots', contact: '8647893200' },
-	  { name: 'pavithraFoods Pvt Ltd', location: 'Karnataka', need: 'onions', contact: '7534578922' },
-	  { name: 'mintmart Wholsalers', location: 'Karnataka', need: 'Carrots', contact: '8864327790' },
-	  { name: 'oraganic Wholesalers', location: 'Karnataka', need: 'Mangoes', contact: '9907554557' },
-    ];
+<!-- SIDEBAR -->
+<div id="rightSidebar" aria-label="Quick Controls">
+  <button class="sidebar-btn" id="brightnessBtn">☀️ Brightness</button>
+  <div id="brightnessPanel" class="slider-panel">
+    <input type="range" id="brightnessSlider" min="50" max="150" value="100">
+  </div>
+  <button class="sidebar-btn" id="soundBtn">🔊 Sound</button>
+  <div id="soundPanel" class="slider-panel">
+    <input type="range" id="soundSlider" min="0" max="100" value="50">
+  </div>
+  <button class="sidebar-btn" id="notifBtn" aria-pressed="true">🔔 Notifications</button>
+  <button class="sidebar-btn" id="helpBtn">❓ Help</button>
+  <button class="sidebar-btn" id="recordBtn">🎥 Screen Record</button>
+</div>
 
-    function openFarmersView() {
-      document.getElementById('homeView').style.display = 'none';
-      document.getElementById('farmerView').style.display = 'block';
-      showBuyersForFarmersList();
-    }
+<!-- Always-visible handle -->
+<div id="sidebarHandle" title="Drag or click"></div>
 
-    function openBuyersView() {
-      document.getElementById('homeView').style.display = 'none';
-      document.getElementById('buyerView').style.display = 'block';
-      showFarmersForBuyersList();
-    }
+<!-- HELP -->
+<div id="helpWindow">
+  <h3>🆘 Detailed Guide – How to Use MarketHive</h3>
+  <ul>
+    <li>🏠 Home: choose <b>Farmer</b> or <b>Buyer</b></li>
+    <li>🌾 Farmer View: register products with min/max qty, fertilizers, materials</li>
+    <li>🛒 Buyer View: register requirements; app matches nearby farmers</li>
+    <li>🔍 Search: filter by product & location</li>
+    <li>📦 Cards: click for full info popup</li>
+    <li>📞 Contact: call or text from popup</li>
+    <li>☀️ Brightness / 🔊 Sound adjust the app area only</li>
+  </ul>
+</div>
 
-    function goHome() {
-      document.getElementById('farmerView').style.display = 'none';
-      document.getElementById('buyerView').style.display = 'none';
-      document.getElementById('homeView').style.display = 'block';
-    }
+<script>
+/* ========= Data ========= */
+const farmers = [
+  {name:'Ravi Kumar',location:'Karnataka',product:'Tomatoes',contact:'9876543210',status:'Available',min:'100kg',max:'500kg',fertilizers:'Organic compost',materials:'',updated:'Today'},
+  {name:'Lakshmi Devi',location:'Andhra',product:'Mangoes',contact:'9123456789',status:'Available',min:'200kg',max:'1000kg',fertilizers:'Cow manure',materials:'',updated:'Today'},
+  {name:'Mahesh Gowda',location:'Karnataka',product:'Sugarcane',contact:'9988776655',status:'Available',min:'500kg',max:'5 tons',fertilizers:'Natural manure',materials:'',updated:'Today'},
+  {name:'Lavanya',location:'Karnataka',product:'Onions',contact:'7654790873',status:'Out of Stock',min:'100kg',max:'800kg',fertilizers:'Organic soil mix',materials:'',updated:'Today'},
+  {name:'Suresh',location:'Goa',product:'Potatoes',contact:'2988587610',status:'Available',min:'150kg',max:'600kg',fertilizers:'Cow dung',materials:'',updated:'Today'},
+  {name:'Krithika',location:'Karnataka',product:'Carrots',contact:'6605482390',status:'Available',min:'120kg',max:'450kg',fertilizers:'Organic soil enhancer',materials:'',updated:'Today'},
+  {name:'Shreya',location:'West Bengal',product:'Baskets',contact:'3895572108',status:'Available',min:'10',max:'200',fertilizers:'',materials:'Bamboo, Jute',updated:'Today'},
+  {name:'Ram',location:'Karnataka',product:'Fabric',contact:'6605482390',status:'Available',min:'50m',max:'300m',fertilizers:'',materials:'Cotton, Silk',updated:'Today'}
+];
+const buyers = [
+  {name:'FreshMart Wholesalers',location:'Karnataka',need:'Tomatoes',contact:'8888999977',status:'Active',min:'200kg',max:'1 ton',materials:'Organic preferred',updated:'Today'},
+  {name:'AgroFoods Pvt Ltd',location:'Andhra',need:'Sugarcane',contact:'7777888899',status:'Active',min:'2 tons',max:'10 tons',materials:'Pure cane',updated:'Today'},
+  {name:'Rajesh Wholesalers',location:'Karnataka',need:'Clay Pots',contact:'8647893200',status:'Active',min:'50',max:'500',materials:'Natural clay',updated:'Today'},
+  {name:'PavithraFoods Pvt Ltd',location:'Goa',need:'Onions',contact:'7534578922',status:'Inactive',min:'100kg',max:'600kg',materials:'Fresh red onions',updated:'Today'},
+  {name:'MintMart Wholesalers',location:'Karnataka',need:'Carrots',contact:'8864327790',status:'Active',min:'150kg',max:'700kg',materials:'Organic only',updated:'Today'},
+  {name:'Organic Wholesalers',location:'Karnataka',need:'Mangoes',contact:'9907554557',status:'Active',min:'300kg',max:'2 tons',materials:'Natural mango pulp',updated:'Today'},
+  {name:'FreshProduct',location:'West Bengal',need:'Baskets',contact:'0963045547',status:'Active',min:'20',max:'500',materials:'Jute, Bamboo',updated:'Today'},
+  {name:'Bharath Need',location:'Karnataka',need:'Fabric',contact:'9667883021',status:'Active',min:'30m',max:'400m',materials:'Silk or Cotton',updated:'Today'}
+];
 
-    function showFarmerForm() {
-      const form = document.getElementById('farmerForm');
-      form.style.display = form.style.display === 'block' ? 'none' : 'block';
-    }
+/* ========= Element refs ========= */
+const appRoot = document.getElementById('appRoot');
+const homeView = document.getElementById('homeView');
+const farmerView = document.getElementById('farmerView');
+const buyerView = document.getElementById('buyerView');
 
-    function showBuyerForm() {
-      const form = document.getElementById('buyerForm');
-      form.style.display = form.style.display === 'block' ? 'none' : 'block';
-    }
+const btnFarmers = document.getElementById('btnFarmers');
+const btnBuyers  = document.getElementById('btnBuyers');
+const backFromFarmer = document.getElementById('backFromFarmer');
+const backFromBuyer  = document.getElementById('backFromBuyer');
 
-    function addFarmer() {
-      const name = document.getElementById('farmerName').value;
-      const location = document.getElementById('farmerLocation').value;
-      const product = document.getElementById('farmerProduct').value;
-      const contact = document.getElementById('farmerContact').value;
+const buyerForFarmerList = document.getElementById('buyerForFarmerList');
+const farmerForBuyerList = document.getElementById('farmerForBuyerList');
 
-      if (name && location && product && contact) {
-        farmers.push({ name, location, product, contact });
-        document.getElementById('farmerForm').reset();
-        document.getElementById('farmerForm').style.display = 'none';
-      }
-    }
+const buyerReqQuery = document.getElementById('buyerReqQuery');
+const buyerLocQuery = document.getElementById('buyerLocQuery');
+const farmerProdQuery = document.getElementById('farmerProdQuery');
+const farmerLocQuery  = document.getElementById('farmerLocQuery');
 
-    function addBuyer() {
-      const name = document.getElementById('buyerName').value;
-      const location = document.getElementById('buyerLocation').value;
-      const need = document.getElementById('buyerNeed').value;
-      const contact = document.getElementById('buyerContact').value;
+const toggleFarmerForm = document.getElementById('toggleFarmerForm');
+const toggleBuyerForm  = document.getElementById('toggleBuyerForm');
+const farmerForm = document.getElementById('farmerForm');
+const buyerForm  = document.getElementById('buyerForm');
 
-      if (name && location && need && contact) {
-        buyers.push({ name, location, need, contact });
-        document.getElementById('buyerForm').reset();
-        document.getElementById('buyerForm').style.display = 'none';
-      }
-    }
+const addFarmerBtn = document.getElementById('addFarmerBtn');
+const addBuyerBtn  = document.getElementById('addBuyerBtn');
 
-    function showBuyersForFarmersList(list = buyers) {
-      const container = document.getElementById('buyerForFarmerList');
-      container.innerHTML = list.map(b => `
-        <div class='card'>
-          <h3>${b.name}</h3>
-          <p><strong>Needs:</strong> ${b.need}</p>
-          <p><strong>Location:</strong> ${b.location}</p>
-          <p><strong>Contact:</strong> ${b.contact}</p>
-        </div>
-      `).join('');
-    }
+/* ========= View switching ========= */
+btnFarmers.onclick = () => { homeView.style.display='none'; farmerView.style.display='block'; renderBuyerCards(); };
+btnBuyers.onclick  = () => { homeView.style.display='none'; buyerView.style.display='block'; renderFarmerCards(); };
+backFromFarmer.onclick = backFromBuyer.onclick = () => {
+  buyerView.style.display='none'; farmerView.style.display='none'; homeView.style.display='block';
+};
 
-    function searchBuyerForFarmer() {
-      const searchValue = document.getElementById('searchBuyerForFarmer').value.toLowerCase();
-      const filtered = buyers.filter(b => b.need.toLowerCase().includes(searchValue) || 
-	  b.location.toLowerCase().includes(searchValue));
-      showBuyersForFarmersList(filtered);
-    }
+/* ========= Forms ========= */
+toggleFarmerForm.onclick = () => { farmerForm.style.display = farmerForm.style.display==='block'?'none':'block'; };
+toggleBuyerForm.onclick  = () => { buyerForm.style.display  = buyerForm.style.display==='block'?'none':'block'; };
 
-    function showFarmersForBuyersList(list = farmers) {
-      const container = document.getElementById('farmerForBuyerList');
-      container.innerHTML = list.map(f => `
-        <div class='card'>
-          <h3>${f.name}</h3>
-          <p><strong>Product:</strong> ${f.product}</p>
-          <p><strong>Location:</strong> ${f.location}</p>
-          <p><strong>Contact:</strong> ${f.contact}</p>
-        </div>
-      `).join('');
-    }
+addFarmerBtn.onclick = () => {
+  const date = new Date().toLocaleString();
+  const f = {
+    name: document.getElementById('farmerName').value.trim(),
+    location: document.getElementById('farmerLocation').value.trim(),
+    product: document.getElementById('farmerProduct').value.trim(),
+    contact: document.getElementById('farmerContact').value.trim(),
+    min: document.getElementById('minQty').value.trim(),
+    max: document.getElementById('maxQty').value.trim(),
+    fertilizers: document.getElementById('fertilizers').value.trim(),
+    materials: document.getElementById('materials').value.trim(),
+    status: document.getElementById('availability').value,
+    updated: date
+  };
+  if (f.name && f.location && f.product && f.contact) {
+    farmers.push(f);
+    farmerForm.reset();
+    farmerForm.style.display='none';
+    renderFarmerCards();
+  }
+};
 
-    function searchFarmerForBuyer() {
-      const searchValue = document.getElementById('searchFarmerForBuyer').value.toLowerCase();
-      const filtered = farmers.filter(f => f.product.toLowerCase().includes(searchValue) || 
-	  f.location.toLowerCase().includes(searchValue));
-      showFarmersForBuyersList(filtered);
-    }
-  </script>
+addBuyerBtn.onclick = () => {
+  const date = new Date().toLocaleString();
+  const b = {
+    name: document.getElementById('buyerName').value.trim(),
+    location: document.getElementById('buyerLocation').value.trim(),
+    need: document.getElementById('buyerNeed').value.trim(),
+    contact: document.getElementById('buyerContact').value.trim(),
+    min: document.getElementById('minQtyBuyer').value.trim(),
+    max: document.getElementById('maxQtyBuyer').value.trim(),
+    materials: document.getElementById('materialsBuyer').value.trim(),
+    status: document.getElementById('availabilityBuyer').value,
+    updated: date
+  };
+  if (b.name && b.location && b.need && b.contact) {
+    buyers.push(b);
+    buyerForm.reset();
+    buyerForm.style.display='none';
+    renderBuyerCards();
+  }
+};
+
+/* ========= Renderers ========= */
+function renderBuyerCards(list = buyers) {
+  buyerForFarmerList.innerHTML='';
+  list.forEach(b=>{
+    const el = document.createElement('div');
+    el.className='card';
+    el.innerHTML = `<h3>${b.name}</h3><p><b>Needs:</b> ${b.need}</p><p class="muted"><b>Location:</b> ${b.location}</p>`;
+    el.onclick = () => openInfoModal(b);
+    buyerForFarmerList.appendChild(el);
+  });
+}
+function renderFarmerCards(list = farmers) {
+  farmerForBuyerList.innerHTML='';
+  list.forEach(f=>{
+    const el = document.createElement('div');
+    el.className='card';
+    el.innerHTML = `<h3>${f.name}</h3><p><b>Product:</b> ${f.product}</p><p class="muted"><b>Location:</b> ${f.location}</p>`;
+    el.onclick = () => openInfoModal(f);
+    farmerForBuyerList.appendChild(el);
+  });
+}
+
+/* ========= Search ========= */
+function searchBuyerForFarmerFn() {
+  const p = buyerReqQuery.value.trim().toLowerCase();
+  const l = buyerLocQuery.value.trim().toLowerCase();
+  renderBuyerCards(buyers.filter(b => (!p || b.need.toLowerCase().includes(p)) && (!l || b.location.toLowerCase().includes(l))));
+}
+function searchFarmerForBuyerFn() {
+  const p = farmerProdQuery.value.trim().toLowerCase();
+  const l = farmerLocQuery.value.trim().toLowerCase();
+  renderFarmerCards(farmers.filter(f => (!p || f.product.toLowerCase().includes(p)) && (!l || f.location.toLowerCase().includes(l))));
+}
+buyerReqQuery.addEventListener('input', searchBuyerForFarmerFn);
+buyerLocQuery.addEventListener('input', searchBuyerForFarmerFn);
+farmerProdQuery.addEventListener('input', searchFarmerForBuyerFn);
+farmerLocQuery.addEventListener('input', searchFarmerForBuyerFn);
+
+/* ========= Modal ========= */
+const infoModal = document.getElementById('infoModal');
+const modalContent = document.getElementById('modalContent');
+function openInfoModal(data) {
+  const isFarmer = !!data.product;
+  const statusClass = (data.status==='Available'||data.status==='Active') ? 'status-green':'status-red';
+  modalContent.innerHTML = `
+    <button id="closeModal">✖</button>
+    <h2>${data.name}</h2>
+    <p><b>Status:</b> <span class="${statusClass}">${data.status}</span></p>
+    <p><b>Location:</b> ${data.location}</p>
+    <p><b>${isFarmer?'Product':'Need'}:</b> ${data.product || data.need}</p>
+    ${data.min?`<p><b>Minimum Quantity:</b> ${data.min}</p>`:''}
+    ${data.max?`<p><b>Maximum Quantity:</b> ${data.max}</p>`:''}
+    ${data.fertilizers?`<p><b>Fertilizers Used:</b> ${data.fertilizers}</p>`:''}
+    ${data.materials?`<p><b>Materials Used:</b> ${data.materials}</p>`:''}
+    <p><b>Contact:</b> ${data.contact}</p>
+    <p><i>Last Updated: ${data.updated||'—'}</i></p>
+    <div class="modal-actions">
+      <a href="tel:${data.contact}">📞 Call</a>
+      <a href="sms:${data.contact}">💬 Text</a>
+      <a href="mailto:info@example.com">📧 Email</a>
+    </div>`;
+  infoModal.style.display='flex';
+  document.getElementById('closeModal').onclick = () => infoModal.style.display='none';
+  infoModal.onclick = (e) => { if (e.target === infoModal) infoModal.style.display='none'; };
+}
+
+/* ========= Sidebar + Handle ========= */
+const sidebar = document.getElementById('rightSidebar');
+const handle  = document.getElementById('sidebarHandle');
+const brightnessBtn = document.getElementById('brightnessBtn');
+const brightnessPanel = document.getElementById('brightnessPanel');
+const brightnessSlider = document.getElementById('brightnessSlider');
+const soundBtn = document.getElementById('soundBtn');
+const soundPanel = document.getElementById('soundPanel');
+const soundSlider = document.getElementById('soundSlider');
+const notifBtn = document.getElementById('notifBtn');
+const helpBtn = document.getElementById('helpBtn');
+const recordBtn = document.getElementById('recordBtn');
+const helpWindow = document.getElementById('helpWindow');
+
+let notifOn = true;
+let dragging = false;
+let dragStartX = 0;
+
+const openSidebar  = () => { sidebar.classList.add('open'); handle.classList.add('docked'); };
+const closeSidebar = () => { sidebar.classList.remove('open'); handle.classList.remove('docked'); };
+
+/* Handle drag/click */
+handle.addEventListener('pointerdown', e => { dragging = true; dragStartX = e.clientX; handle.setPointerCapture(e.pointerId); });
+handle.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - dragStartX;
+  if (dx < -30) openSidebar();   // pulled left
+  if (dx > 30)  closeSidebar();  // pushed right
+});
+handle.addEventListener('pointerup', e => {
+  handle.releasePointerCapture(e.pointerId);
+  const dx = e.clientX - dragStartX;
+  if (Math.abs(dx) < 10) { sidebar.classList.contains('open') ? closeSidebar() : openSidebar(); }
+  dragging = false;
+});
+
+/* Buttons */
+brightnessBtn.onclick = () => {
+  openSidebar();
+  const show = brightnessPanel.style.display !== 'block';
+  brightnessPanel.style.display = show ? 'block' : 'none';
+  soundPanel.style.display='none';
+};
+soundBtn.onclick = () => {
+  openSidebar();
+  const show = soundPanel.style.display !== 'block';
+  soundPanel.style.display = show ? 'block' : 'none';
+  brightnessPanel.style.display='none';
+};
+notifBtn.onclick = () => {
+  openSidebar();
+  notifOn = !notifOn;
+  notifBtn.textContent = notifOn ? '🔔 Notifications' : '🔕 Notifications Off';
+  notifBtn.classList.toggle('notif-off', !notifOn);
+  notifBtn.setAttribute('aria-pressed', String(notifOn));
+};
+/* Help window near Help button */
+helpBtn.onclick = () => {
+  openSidebar();
+  helpWindow.style.display = helpWindow.style.display === 'block' ? 'none' : 'block';
+  helpWindow.style.right = '280px';
+  helpWindow.style.top = '80px';
+};
+recordBtn.onclick = () => { openSidebar(); alert('🎥 Screen recording feature coming soon!'); };
+
+/* Sliders apply to #appRoot only (keeps sidebar stable) */
+brightnessSlider.addEventListener('input', () => { appRoot.style.filter = `brightness(${brightnessSlider.value}%)`; });
+soundSlider.addEventListener('input', () => { appRoot.style.opacity = 0.8 + (soundSlider.value/200); });
+
+/* Initial lists */
+renderBuyerCards();
+renderFarmerCards();
+</script>
 </body>
 </html>
