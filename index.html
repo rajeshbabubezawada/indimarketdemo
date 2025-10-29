@@ -67,11 +67,14 @@
   @keyframes fadeIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
 
   /* Language */
-  #langBtn{position:absolute;left:1rem;top:1rem;z-index:10;background:#fff;color:var(--lav);border:none;padding:.4rem .9rem;border-radius:20px;font-weight:700;cursor:pointer;transition:.25s}
+  #langBtn{position:fixed;left:1rem;top:1rem;z-index:10;background:#fff;color:var(--lav);border:none;padding:.4rem .9rem;border-radius:20px;font-weight:700;cursor:pointer;transition:.25s}
   #langBtn:hover{background:var(--primary);color:#fff}
   #langPanel{display:none;position:absolute;top:3rem;left:1rem;z-index:20;background:rgba(255,255,255,.97);color:#333;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.25);padding:.6rem .8rem;text-align:left;min-width:150px;animation:fadeIn .2s ease}
   #langPanel button{display:block;width:100%;text-align:left;background:none;border:none;padding:.35rem .25rem;font-weight:600;color:#333;border-radius:6px;cursor:pointer;transition:.15s}
   #langPanel button:hover{background:var(--lav);color:#fff}
+ 
+
+
 
   /* Profit Calculator modal */
   #calcModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);justify-content:center;align-items:center;z-index:500}
@@ -199,7 +202,7 @@
     form.panel{width:95%}
     .row{gap:.5rem}
     input,select{width:100%}
-    #helpWindow{width:90vw;right:calc(5vw);left:auto}
+    #helpWindow{width:70vw;right:calc(5vw);left:auto;font-size:12px}
     #modalContent{width:94vw;max-height:80vh}
     #calcBox{width:92vw}
     #chatPanel{right:10px;bottom:70px;width:94vw;max-height:70vh}
@@ -221,16 +224,47 @@
     #modalContent::-webkit-scrollbar,
     #serviceResults::-webkit-scrollbar{width:0;height:0}
   }
-
-  /* Very small phones */
-  @media (max-width: 400px){
-    h1{font-size:1.35rem}
-    button,.btn{padding:.6rem 1rem}
-    #chatFab{right:12px;bottom:12px}
-    #chatPanel{right:8px;bottom:64px}
-    #waChatWindow{right:8px;bottom:8px}
-    #sidebarHandle{width:26px;height:64px}
+  /* Media query for mobile view */
+/* 📱 Mobile view — keep left, shorten text, slightly smaller font */
+/* 📱 Mobile view — keep left, compact size, smaller font */
+@media (max-width: 768px) {
+  #langBtn {
+    position: fixed !important;
+    left: 0.8rem !important;
+    top: 0.8rem !important;
+    z-index: 1000;
+    background: #fff;
+    color: var(--lav);
+    border: none;
+    padding: 0.25rem 0.55rem;  /* 👈 reduced padding */
+    border-radius: 14px;       /* 👈 smaller rounded corners */
+    font-weight: 100;
+    cursor: pointer;
+    transition: 0.25s;
+    font-size: 0; /* hide original text */
+    transform: scale(0.9);
   }
+
+  /* Replace label with shorter + smaller text */
+  #langBtn::before {
+    content: "🌐 Lang";
+    font-size: 0.52rem;  /* 👈 slightly smaller text */
+  }
+
+  #langBtn:hover {
+    background: var(--primary);
+    color: #fff;
+    transform: scale(0.98);
+  }
+}
+
+
+
+
+
+ 
+
+
 </style>
 </head>
 <body>
@@ -240,7 +274,6 @@
 
 <div id="appRoot">
   <header>
-    <!-- Language -->
     <button id="langBtn">🌐 Language</button>
     <div id="langPanel" role="menu" aria-label="Choose language">
       <button data-lang="en">English</button>
@@ -253,6 +286,8 @@
 
     <h1 id="title">MarketHive 🌾</h1>
     <p class="lead" id="tagline">Connecting Farmers, Buyers & Industries</p>
+	<!-- Language -->
+    
   </header>
 
   <!-- HOME -->
@@ -927,7 +962,7 @@ handle.addEventListener('pointerup',e=>{handle.releasePointerCapture(e.pointerId
 brightnessBtn.onclick=()=>{openSidebar();const show=brightnessPanel.style.display!=='block';brightnessPanel.style.display=show?'block':'none';soundPanel.style.display='none';weatherPanel.style.display='none';};
 soundBtn.onclick=()=>{openSidebar();const show=soundPanel.style.display!=='block';soundPanel.style.display=show?'block':'none';brightnessPanel.style.display='none';weatherPanel.style.display='none';};
 notifBtn.onclick=()=>{openSidebar();notifOn=!notifOn;notifBtn.textContent=notifOn?`🔔 ${t('notifications_on')}`:`🔕 ${t('notifications_off')}`;notifBtn.classList.toggle('notif-off',!notifOn);notifBtn.setAttribute('aria-pressed',String(notifOn));};
-helpBtn.onclick=()=>{openSidebar();helpWindow.style.display=helpWindow.style.display==='block'?'none':'block';helpWindow.style.right='280px';helpWindow.style.top='80px';};
+helpBtn.onclick=()=>{openSidebar();helpWindow.style.display=helpWindow.style.display==='block'?'none':'block';helpWindow.style.right='80px';helpWindow.style.top='80px';};
 recordBtn.onclick=()=>{openSidebar();alert(t('recordAlert'));};
 weatherBtn.onclick=()=>{openSidebar();const show=weatherPanel.style.display!=='block';weatherPanel.style.display=show?'block':'none';brightnessPanel.style.display='none';soundPanel.style.display='none';};
 
@@ -1370,6 +1405,7 @@ function applyServiceLang(){
     currentLang==='ta'?"சேவைகளை காண்க":
     "পরিষেবা খুঁজুন";
 }
+
 
 
 </script>
