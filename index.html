@@ -1,168 +1,1586 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>MarketHive 🌾</title>
 <style>
-  :root {
-    --primary:#ffa500;
-    --lav:#d291ff;
-    --white:#fff;
-    --text:#333;
-    --green:#28a745;
-    --red:#d9534f;
-  }
-  * { box-sizing: border-box; }
+  :root{--primary:#ffa500;--lav:#d291ff;--white:#fff;--text:#333;--green:#28a745;--red:#d9534f}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#ffb6c1,#ffa500,#d291ff);color:#fff;text-align:center;padding-top:2rem}
+  #appRoot{transition:filter .25s,opacity .25s}
+  header{background:rgba(255,255,255,.12);padding:1rem 2rem;border-radius:20px;margin:0 auto 1.25rem;backdrop-filter:blur(8px);width:min(100%,900px);position:relative}
+  h1{margin:0;font-size:2rem}
+  p.lead{margin:.4rem 0 0;opacity:.95}
+  button,.btn{background:#fff;color:var(--lav);border:none;padding:.7rem 1.2rem;border-radius:25px;cursor:pointer;font-weight:700;margin:.4rem;transition:.2s}
+  button:hover,.btn:hover{background:var(--primary);color:#fff}
 
-  body {
-    margin:0;
-    font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    background:linear-gradient(135deg,#ffb6c1,#ffa500,#d291ff);
-    color:#fff;
-    text-align:center;
-    padding-top:2rem;
-  }
+  .search-bar-container{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin:1rem auto;width:min(100%,900px)}
+  .search-input{border:none;border-radius:15px;padding:.65rem 1rem;width:260px;outline:none}
+  .card-container{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;width:min(100%,1100px);margin:0 auto}
+  .card{background:#fff;color:#333;border-radius:18px;padding:1rem;width:250px;box-shadow:0 6px 16px rgba(0,0,0,.18);cursor:pointer;transition:transform .2s,box-shadow .2s}
+  .card:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 22px rgba(0,0,0,.25)}
+  .muted{opacity:.8}
+  .badge{display:inline-flex;align-items:center;gap:.3rem;background:#e9f9ee;color:#1f7a3a;border-radius:999px;padding:.15rem .5rem;font-size:.75rem;font-weight:800}
 
-  #appRoot { transition: filter .25s, opacity .25s; }
+  form.panel{background:rgba(255,255,255,.2);padding:1rem;border-radius:15px;margin:1rem auto;width:min(100%,700px);display:none;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+  .row{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
+  input,select{border:none;border-radius:10px;padding:.55rem .7rem;outline:none;width:min(320px,90%)}
+  .hint{margin-top:.5rem;font-weight:700}
+  .hint span{background:#fff;color:#333;border-radius:10px;padding:.25rem .5rem}
 
-  header {
-    background:rgba(255,255,255,.12);
-    padding:1rem 1rem;
-    border-radius:20px;
-    margin:0 auto 1.25rem;
-    backdrop-filter:blur(8px);
-    width:min(100%,900px);
-  }
-  h1 { margin:0; font-size:1.8rem; }
-  p.lead { margin:.4rem 0 0; opacity:.95; font-size:1rem; }
-
-  /* Buttons */
-  button, .btn {
-    background:#fff; color:var(--lav); border:none; padding:.7rem 1.2rem;
-    border-radius:25px; cursor:pointer; font-weight:700; margin:.4rem; transition:.2s;
-    font-size:1rem;
-  }
-  button:hover, .btn:hover { background:var(--primary); color:#fff; }
-
-  /* Search + cards */
-  .search-bar-container {
-    display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem;
-    margin: 1rem auto; width:min(100%, 900px);
-  }
-  .search-input {
-    border:none; border-radius:15px; padding:.65rem 1rem;
-    width:260px; outline:none; font-size:1rem;
-  }
-
-  .card-container {
-    display:flex; flex-wrap:wrap; justify-content:center; gap:1rem;
-    width:min(100%, 1100px); margin:0 auto;
-  }
-  .card {
-    background:#fff; color:#333; border-radius:18px; padding:1rem;
-    width:250px; box-shadow:0 6px 16px rgba(0,0,0,.18);
-    cursor:pointer; transition:transform .2s, box-shadow .2s;
-  }
-  .card:hover { transform:translateY(-2px) scale(1.03); box-shadow:0 10px 22px rgba(0,0,0,.25);}
-  .muted { opacity:.8; }
-
-  /* Forms */
-  form.panel {
-    background:rgba(255,255,255,.2); padding:1rem; border-radius:15px;
-    margin:1rem auto; width:min(100%,700px); display:none;
-    box-shadow:0 4px 12px rgba(0,0,0,.15);
-  }
-  .row { display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; }
-  input, select {
-    border:none; border-radius:10px; padding:.55rem .7rem; outline:none;
-    width:min(320px, 90%); font-size:1rem;
-  }
-
-  /* Modal */
-  #infoModal {
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,.72);
-    justify-content:center; align-items:center; z-index:400; padding:1rem;
-  }
-  #modalContent {
-    background:#fff; color:#333; border-radius:20px; padding:1.6rem;
-    width:min(92%, 760px); text-align:center;
-    box-shadow:0 16px 36px rgba(0,0,0,.38);
-    position:relative; animation: pop .25s ease; max-height:90vh; overflow-y:auto;
-  }
-  #closeModal { position:absolute; top:10px; right:12px; background:none; border:none; font-size:1.6rem; color:#555; cursor:pointer; }
-  .status-green { color:var(--green); font-weight:700; }
-  .status-red { color:var(--red); font-weight:700; }
-  .modal-actions { display:flex; justify-content:center; flex-wrap:wrap; gap:.5rem; margin-top:1rem; }
-  .modal-actions a { text-decoration:none; padding:.6rem 1rem; border-radius:22px; color:#fff; background:var(--primary); font-weight:700; }
-  .modal-actions a:hover { background:var(--lav); }
-  @keyframes pop { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
+  #infoModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);justify-content:center;align-items:center;z-index:400}
+  #modalContent{background:#fff;color:#333;border-radius:20px;padding:1.6rem;width:min(92%,760px);text-align:center;box-shadow:0 16px 36px rgba(0,0,0,.38);position:relative;animation:pop .25s ease;max-height:85vh;overflow:auto}
+  #closeModal{position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.6rem;color:#555;cursor:pointer}
+  .status-green{color:var(--green);font-weight:700}
+  .status-red{color:var(--red);font-weight:700}
+  .modal-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+  .modal-actions a{text-decoration:none;padding:.6rem 1rem;border-radius:22px;color:#fff;background:var(--primary);font-weight:700}
+  .modal-actions a:hover{background:var(--lav)}
+  @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  footer p{opacity:.95}
 
   /* Sidebar */
-  #rightSidebar {
-    position: fixed; top: 50%; right: -260px; transform: translateY(-50%);
-    width: 260px; max-height:85vh;
-    background: linear-gradient(180deg,#ffb6c1cc,#d291ffcc,#ffa500cc);
-    border-radius: 20px 0 0 20px; box-shadow: -4px 0 12px rgba(0,0,0,.3);
-    padding:16px 12px 20px; transition:right .3s ease;
-    z-index: 500; display:flex; flex-direction:column;
-    justify-content:flex-start; overflow-y:auto; scrollbar-width: thin;
-  }
-  #rightSidebar.open { right:0; }
-  #sidebarHandle {
-    position: fixed; right:0; top:50%; transform:translateY(-50%);
-    width:36px; height:90px;
-    background: linear-gradient(180deg, var(--primary), #ff66b2);
-    border-radius:16px 0 0 16px; box-shadow:0 0 14px rgba(255,255,255,.55);
-    cursor:pointer; z-index:600;
-    animation: glow 2s ease-in-out infinite alternate;
-  }
-  #sidebarHandle.docked { right:260px; }
-  @keyframes glow { from { box-shadow:0 0 10px var(--primary);} to { box-shadow:0 0 20px #ff66b2;} }
-  .sidebar-btn {
-    background: rgba(255,255,255,.95); color:#333; border:none; border-radius:12px;
-    font-weight:700; padding:10px; margin:8px 0; cursor:pointer;
-    transition:.2s; width:100%; font-size:1rem;
-  }
-  .sidebar-btn:hover { background:var(--primary); color:#fff; transform: translateX(-3px); }
-  .slider-panel { display:none; background: rgba(255,255,255,.95); padding:12px; border-radius:10px; margin:4px 0 10px; }
-  .slider-panel input[type=range]{ width:100%; accent-color: var(--primary); }
-  .notif-off { text-decoration: line-through; opacity:.7; }
+  #rightSidebar{position:fixed;top:50%;right:-260px;transform:translateY(-50%);width:260px;max-height:85vh;background:linear-gradient(180deg,#ffb6c1cc,#d291ffcc,#ffa500cc);border-radius:20px 0 0 20px;box-shadow:-4px 0 12px rgba(0,0,0,.3);padding:16px 12px 20px;transition:right .28s ease;z-index:550;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin}
+  #rightSidebar.open{right:0}
+  #sidebarHandle{position:fixed;right:0;top:50%;transform:translateY(-50%);width:36px;height:90px;background:linear-gradient(180deg,var(--primary),#ff66b2);border-radius:16px 0 0 16px;box-shadow:0 0 14px rgba(255,255,255,.55);cursor:pointer;z-index:600;animation:glow 2s ease-in-out infinite alternate}
+  #sidebarHandle.docked{right:260px}
+  @keyframes glow{from{box-shadow:0 0 10px var(--primary)}to{box-shadow:0 0 20px #ff66b2}}
+  .sidebar-btn{background:rgba(255,255,255,.95);color:#333;border:none;border-radius:12px;font-weight:700;padding:10px;margin:8px 0;cursor:pointer;transition:.2s;width:100%}
+  .sidebar-btn:hover{background:var(--primary);color:#fff;transform:translateX(-3px)}
+  .slider-panel,.side-panel{display:none;background:rgba(255,255,255,.95);padding:12px;border-radius:10px;margin:4px 0 10px}
+  .slider-panel input[type=range]{width:100%;accent-color:var(--primary)}
+  .notif-off{text-decoration:line-through;opacity:.7}
+  .side-row{display:flex;gap:.4rem;align-items:center;justify-content:space-between}
 
-  #helpWindow {
-    position: fixed; background:#fff; color:#333; border-radius:12px; padding:14px 16px;
-    box-shadow:0 8px 24px rgba(0,0,0,.25); width:340px; max-height:70vh; overflow-y:auto;
-    display:none; z-index:650; animation:fadeIn .25s ease;
-  }
-  #helpWindow h3{color: var(--primary); margin:.2rem 0 .6rem;}
-  #helpWindow ul{text-align:left; padding-left:18px; margin:0;}
-  #helpWindow li{margin-bottom:8px;}
-  @keyframes fadeIn{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);} }
+  /* Weather */
+  .weather-line{display:flex;align-items:center;justify-content:space-between;margin:.3rem 0}
+  .weather-big{font-size:1.5rem;font-weight:800}
+  .subtle{opacity:.8;font-size:.9rem}
 
-  /* ====== MOBILE RESPONSIVENESS ====== */
-  @media (max-width: 768px) {
-    body { padding-top:1rem; font-size:0.95rem; }
-    header { width:95%; padding:1rem; }
-    .card { width:90%; }
-    .search-input { width:90%; }
-    button, .btn { width:90%; font-size:1rem; }
-    form.panel { width:95%; }
-    #rightSidebar {
-      width:220px; right:-220px; padding:12px 10px;
+  /* Help */
+  #helpWindow{position:fixed;background:#fff;color:#333;border-radius:12px;padding:14px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);width:340px;max-height:70vh;overflow-y:auto;display:none;z-index:650;animation:fadeIn .25s ease}
+  #helpWindow h3{color:var(--primary);margin:.2rem 0 .6rem}
+  #helpWindow ul{text-align:left;padding-left:18px;margin:0}
+  #helpWindow li{margin-bottom:8px}
+  @keyframes fadeIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+
+  /* Language */
+  #langBtn{position:absolute;left:1rem;top:1rem;z-index:10;background:#fff;color:var(--lav);border:none;padding:.4rem .9rem;border-radius:20px;font-weight:700;cursor:pointer;transition:.25s}
+  #langBtn:hover{background:var(--primary);color:#fff}
+  #langPanel{display:none;position:absolute;top:3rem;left:1rem;z-index:20;background:rgba(255,255,255,.97);color:#333;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.25);padding:.6rem .8rem;text-align:left;min-width:150px;animation:fadeIn .2s ease}
+  #langPanel button{display:block;width:100%;text-align:left;background:none;border:none;padding:.35rem .25rem;font-weight:600;color:#333;border-radius:6px;cursor:pointer;transition:.15s}
+  #langPanel button:hover{background:var(--lav);color:#fff}
+
+  /* Profit Calculator modal */
+  #calcModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);justify-content:center;align-items:center;z-index:500}
+  #calcBox{background:#fff;color:#333;border-radius:16px;padding:18px;width:min(92%,460px);box-shadow:0 10px 28px rgba(0,0,0,.35)}
+  #calcBox h3{margin:0 0 .6rem}
+  #calcBox .row input{width:calc(50% - .6rem)}
+
+  /* Chatbot */
+  #chatFab{position:fixed;right:18px;bottom:18px;background:#fff;color:#333;border:none;border-radius:999px;padding:.8rem 1rem;font-weight:800;box-shadow:0 10px 22px rgba(0,0,0,.25);cursor:pointer;z-index:700}
+  #chatPanel{display:none;position:fixed;right:18px;bottom:78px;width:min(92%,380px);max-height:60vh;background:#fff;color:#333;border-radius:16px;box-shadow:0 14px 30px rgba(0,0,0,.3);z-index:700;overflow:hidden}
+  #chatHead{background:linear-gradient(90deg,#ffa500,#d291ff);color:#fff;padding:10px 12px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+  #chatBody{padding:10px;overflow-y:auto;max-height:45vh;display:flex;flex-direction:column}
+  .msg{margin:6px 0;padding:8px 10px;border-radius:12px;max-width:85%;white-space:pre-wrap}
+  .me{background:#eef;align-self:flex-end;margin-left:auto}
+  .bot{background:#f7f7f7}
+  #chatInputRow{display:flex;gap:6px;padding:10px;border-top:1px solid #eee}
+  #chatInput{flex:1;border:1px solid #ddd;border-radius:10px;padding:.55rem .7rem;outline:none}
+
+  /* ===== NEW: WhatsApp-style in-page texting window ===== */
+  #waChatWindow{display:none;position:fixed;right:18px;bottom:18px;width:min(92%,360px);height:68vh;background:#e5ddd5;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35);z-index:1000;overflow:hidden;display:flex;flex-direction:column;animation:fadeIn .25s ease}
+  #waChatHeader{background:linear-gradient(90deg,#ffa500,#d291ff);color:#fff;font-weight:700;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+  #waChatMessages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;background:#d9d7d1}
+  .waMsg{max-width:75%;padding:8px 12px;border-radius:14px;line-height:1.3;font-size:.9rem;word-break:break-word}
+  .waMe{align-self:flex-end;background:#dcf8c6;color:#333}
+  .waThem{align-self:flex-start;background:#fff;color:#333}
+  .waTime{display:block;font-size:.7rem;opacity:.65;margin-top:4px;text-align:right}
+  #waChatInputRow{display:flex;gap:8px;padding:8px;background:#f7f7f7;border-top:1px solid #ddd}
+  #waChatInput{flex:1;border:none;border-radius:20px;padding:8px 12px;outline:none;font-size:.9rem}
+  #waChatSend{border:none;background:#ffa500;color:#fff;border-radius:20px;padding:8px 14px;cursor:pointer;font-weight:700}
+  
+  /* 🌾 Nearby Service Finder */
+  #footerServiceBtn {
+    margin-top: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    background: rgba(255,255,255,0.15);
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    color: #fff;
+    transition: 0.2s;
+  }
+  #footerServiceBtn:hover {
+    background: rgba(255,255,255,0.35);
+    transform: scale(1.03);
+  }
+
+  /* Floating popup */
+  #servicePopup {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    animation: fadeIn 0.25s ease;
+  }
+  #serviceCard {
+    background: #fff;
+    color: #333;
+    width: min(92%, 400px);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+    max-height: 85vh;
+  }
+  #serviceHeader {
+    background: linear-gradient(90deg,#ffa500,#d291ff);
+    color: #fff;
+    padding: 10px;
+    font-weight: 800;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #serviceBody {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  #serviceBody input, #serviceBody select {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  #serviceResults {
+    margin-top: 8px;
+    text-align: left;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .serviceItem {
+    background: #f9f9f9;
+    margin: 5px 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    line-height: 1.3;
+    font-size: 0.9rem;
+  }
+
+  /* ====== Minimal loader (fade-in) ====== */
+  #appLoader{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.25);z-index:1200;transition:opacity .3s ease,visibility .3s ease;
+  }
+  #appLoader.hide{opacity:0;visibility:hidden}
+  .spinner{
+    width:44px;height:44px;border-radius:50%;
+    border:4px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin 1s linear infinite
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ====== MOBILE RESPONSIVE ENHANCEMENTS (no desktop changes) ====== */
+  /* Phones & small tablets */
+  @media (max-width: 768px){
+    body{padding-top:1rem}
+    header{width:95%;padding:0.8rem 1rem}
+    h1{font-size:1.6rem}
+    .search-bar-container{width:95%;gap:.5rem}
+    .search-input{width:100%}
+    .card-container{width:95%;gap:.8rem}
+    .card{width:100%}
+    form.panel{width:95%}
+    .row{gap:.5rem}
+    input,select{width:100%}
+    #helpWindow{width:90vw;right:calc(5vw);left:auto}
+    #modalContent{width:94vw;max-height:80vh}
+    #calcBox{width:92vw}
+    #chatPanel{right:10px;bottom:70px;width:94vw;max-height:70vh}
+    #chatBody{max-height:56vh}
+    #waChatWindow{right:10px;bottom:10px;width:94vw;height:70vh}
+    #rightSidebar{width:88vw;right:-88vw;border-radius:16px 0 0 16px;max-height:90vh}
+    #rightSidebar.open{right:0}
+    #sidebarHandle{width:30px;height:70px}
+    #sidebarHandle.docked{right:88vw}
+    #serviceCard{width:92vw}
+    #footerServiceBtn{display:inline-block}
+    /* Touch-friendly scroll & minimal scrollbars on mobile */
+    #rightSidebar,#chatBody,#waChatMessages,#modalContent,#serviceResults{
+      -webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none;
     }
-    #rightSidebar.open { right:0; }
-    #sidebarHandle { width:32px; height:80px; }
-    #helpWindow { width:85%; left:50%; transform:translateX(-50%); right:auto; top:20%; }
+    #rightSidebar::-webkit-scrollbar,
+    #chatBody::-webkit-scrollbar,
+    #waChatMessages::-webkit-scrollbar,
+    #modalContent::-webkit-scrollbar,
+    #serviceResults::-webkit-scrollbar{width:0;height:0}
+  }
+
+  /* Very small phones */
+  @media (max-width: 400px){
+    h1{font-size:1.35rem}
+    button,.btn{padding:.6rem 1rem}
+    #chatFab{right:12px;bottom:12px}
+    #chatPanel{right:8px;bottom:64px}
+    #waChatWindow{right:8px;bottom:8px}
+    #sidebarHandle{width:26px;height:64px}
   }
 </style>
 </head>
 <body>
 
-<!-- existing HTML remains identical -->
-<!-- (Paste your previous MarketHive HTML content here — all works, just updated CSS for responsiveness) -->
+<!-- 🔄 Tiny loading overlay (fades out) -->
+<div id="appLoader"><div class="spinner"></div></div>
+
+<div id="appRoot">
+  <header>
+    <!-- Language -->
+    <button id="langBtn">🌐 Language</button>
+    <div id="langPanel" role="menu" aria-label="Choose language">
+      <button data-lang="en">English</button>
+      <button data-lang="hi">हिन्दी</button>
+      <button data-lang="te">తెలుగు</button>
+      <button data-lang="kn">ಕನ್ನಡ</button>
+      <button data-lang="ta">தமிழ்</button>
+      <button data-lang="bn">বাংলা</button>
+    </div>
+
+    <h1 id="title">MarketHive 🌾</h1>
+    <p class="lead" id="tagline">Connecting Farmers, Buyers & Industries</p>
+  </header>
+
+  <!-- HOME -->
+  <div id="homeView">
+    <button id="btnFarmers">Farmers / Small-Scale Industrialists</button>
+    <button id="btnBuyers">Buyers</button>
+  </div>
+
+  <!-- FARMER VIEW -->
+  <div id="farmerView" style="display:none;">
+    <div>
+      <button id="toggleFarmerForm">+ Register New Product</button>
+      <button id="openCalcFarmer">💰 Estimate Profit</button>
+    </div>
+    <form id="farmerForm" class="panel">
+      <h3 id="farmerFormTitle">Register New Product</h3>
+      <div class="row">
+        <input id="farmerName" placeholder="Name" required>
+        <input id="farmerLocation" placeholder="Location" required>
+        <input id="farmerProduct" placeholder="Product" required>
+        <input id="farmerContact" placeholder="Contact" required>
+        <input id="minQty" placeholder="Minimum Quantity (optional)">
+        <input id="maxQty" placeholder="Maximum Quantity (optional)">
+        <input id="fertilizers" placeholder="Fertilizers Used (optional)">
+        <input id="materials" placeholder="Materials Used (optional)">
+        <select id="availability">
+          <option value="Available">Available</option>
+          <option value="Out of Stock">Out of Stock</option>
+        </select>
+      </div>
+      <!-- AI Price Suggestion -->
+      <div id="priceHint" class="hint"></div>
+      <button type="button" id="addFarmerBtn">Add Product</button>
+    </form>
+
+    <div class="search-bar-container">
+      <input id="buyerReqQuery" class="search-input" placeholder="Search Buyer Requirements...">
+      <input id="buyerLocQuery" class="search-input" placeholder="Search by Location...">
+    </div>
+    <div class="card-container" id="buyerForFarmerList"></div>
+    <button class="btn" id="backFromFarmer">⬅ Back</button>
+  </div>
+
+  <!-- BUYER VIEW -->
+  <div id="buyerView" style="display:none;">
+    <div>
+      <button id="toggleBuyerForm">+ Register New Requirement</button>
+      <button id="openCalcBuyer">💰 Estimate Profit</button>
+    </div>
+    <form id="buyerForm" class="panel">
+      <h3 id="buyerFormTitle">Register New Buyer Requirement</h3>
+      <div class="row">
+        <input id="buyerName" placeholder="Buyer Name" required>
+        <input id="buyerLocation" placeholder="Location" required>
+        <input id="buyerNeed" placeholder="Need (Product Type)" required>
+        <input id="buyerContact" placeholder="Contact" required>
+        <input id="minQtyBuyer" placeholder="Minimum Quantity (optional)">
+        <input id="maxQtyBuyer" placeholder="Maximum Quantity (optional)">
+        <input id="materialsBuyer" placeholder="Preferred Materials (optional)">
+        <select id="availabilityBuyer">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <button type="button" id="addBuyerBtn">Add Requirement</button>
+    </form>
+
+    <div class="search-bar-container">
+      <input id="farmerProdQuery" class="search-input" placeholder="Search Farmer Products...">
+      <input id="farmerLocQuery" class="search-input" placeholder="Search by Location...">
+    </div>
+    <div class="card-container" id="farmerForBuyerList"></div>
+    <button class="btn" id="backFromBuyer">⬅ Back</button>
+  </div>
+
+  <!-- MODALS -->
+  <div id="infoModal"><div id="modalContent"></div></div>
+
+  <!-- Profit Calculator (auto-detect mode) -->
+  <div id="calcModal">
+    <div id="calcBox">
+      <div class="side-row">
+        <h3 id="calcTitle" style="margin:.2rem 0">Profit Calculator</h3>
+        <button id="closeCalc" class="btn">✖</button>
+      </div>
+      <div class="row">
+        <input id="calcCost" placeholder="Cost/Buying price per unit (₹)">
+        <input id="calcPrice" placeholder="Selling price per unit (₹)">
+        <input id="calcQty" placeholder="Quantity (units)">
+      </div>
+      <div class="hint" id="calcResult"></div>
+      <div style="margin-top:.6rem">
+        <button id="doCalc" class="btn">Calculate</button>
+      </div>
+    </div>
+  </div>
+
+  <footer><p id="footerText">Demo App • Made for Viksit Bharat Buildathon 2025</p></footer>
+</div>
+
+<!-- SIDEBAR -->
+<div id="rightSidebar" aria-label="Quick Controls">
+  <button class="sidebar-btn" id="brightnessBtn">☀️ Brightness</button>
+  <div id="brightnessPanel" class="slider-panel">
+    <input type="range" id="brightnessSlider" min="50" max="150" value="100">
+  </div>
+  <button class="sidebar-btn" id="soundBtn">🔊 Sound</button>
+  <div id="soundPanel" class="slider-panel">
+    <input type="range" id="soundSlider" min="0" max="100" value="50">
+  </div>
+  <button class="sidebar-btn" id="notifBtn" aria-pressed="true">🔔 Notifications</button>
+
+  <!-- Weather -->
+  <button class="sidebar-btn" id="weatherBtn">🌦 Weather</button>
+  <div id="weatherPanel" class="side-panel">
+    <div class="side-row"><input id="weatherPlace" placeholder="Enter city/state"><button id="weatherGo" class="btn">Go</button></div>
+    <div class="weather-line"><span class="subtle" id="weatherStatus">Waiting...</span></div>
+    <div class="weather-line"><span id="weatherTemp" class="weather-big">--°C</span><span id="weatherHum" class="subtle">--% RH</span></div>
+  </div>
+
+  <button class="sidebar-btn" id="helpBtn">❓ Help</button>
+  <button class="sidebar-btn" id="recordBtn">🎥 Screen Record</button>
+</div>
+<div id="sidebarHandle" title="Drag or click"></div>
+
+<!-- HELP -->
+<div id="helpWindow">
+  <h3 id="helpTitle">🆘 Detailed Guide – How to Use MarketHive</h3>
+  <ul id="helpList">
+    <li>🏠 Home: choose <b>Farmer</b> or <b>Buyer</b></li>
+    <li>🌾 Farmer View: register products with min/max qty, fertilizers, materials</li>
+    <li>🛒 Buyer View: register requirements; app matches nearby farmers</li>
+    <li>🔍 Search: filter by product & location</li>
+    <li>📦 Cards: click for full info popup</li>
+    <li>📞 Contact: call or text from popup</li>
+    <li>☀️ Brightness / 🔊 Sound adjust the app area only</li>
+  </ul>
+</div>
+
+<!-- CHATBOT -->
+<button id="chatFab">🤖 Kisan AI</button>
+<div id="chatPanel" aria-live="polite">
+  <div id="chatHead">
+    <span id="chatTitle">Kisan AI Assistant</span>
+    <button id="chatClose" class="btn">✖</button>
+  </div>
+  <div id="chatBody"></div>
+  <div id="chatInputRow">
+    <input id="chatInput" placeholder="Ask about crops, prices, tips..."/>
+    <button id="chatSend" class="btn">Send</button>
+  </div>
+</div>
+
+<!-- ===== NEW: In-page WhatsApp-style texting window (stays hidden until used) ===== -->
+<div id="waChatWindow">
+  <div id="waChatHeader">
+    <span id="waChatUser">Chat</span>
+    <button id="waChatClose" class="btn" style="margin:0;background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:10px;padding:.3rem .6rem">✖</button>
+  </div>
+  <div id="waChatMessages"></div>
+  <div id="waChatInputRow">
+    <input id="waChatInput" placeholder="Type a message...">
+    <button id="waChatSend">Send</button>
+  </div>
+</div>
+<script>
+/* =========================
+   Seed Data (canonical EN)
+========================= */
+const farmers = [
+  {name:'Ravi Kumar',location:'Karnataka',product:'Tomatoes',contact:'9876543210',status:'Available',min:'100kg',max:'500kg',fertilizers:'Organic compost',materials:'',updated:'Today'},
+  {name:'Lakshmi Devi',location:'Andhra',product:'Mangoes',contact:'9123456789',status:'Available',min:'200kg',max:'1000kg',fertilizers:'Cow manure',materials:'',updated:'Today'},
+  {name:'Mahesh Gowda',location:'Karnataka',product:'Sugarcane',contact:'9988776655',status:'Available',min:'500kg',max:'5 tons',fertilizers:'Natural manure',materials:'',updated:'Today'},
+  {name:'Lavanya',location:'Karnataka',product:'Onions',contact:'7654790873',status:'Out of Stock',min:'100kg',max:'800kg',fertilizers:'Organic soil mix',materials:'',updated:'Today'},
+  {name:'Suresh',location:'Goa',product:'Potatoes',contact:'2988587610',status:'Available',min:'150kg',max:'600kg',fertilizers:'Cow dung',materials:'',updated:'Today'},
+  {name:'Krithika',location:'Karnataka',product:'Carrots',contact:'6605482390',status:'Available',min:'120kg',max:'450kg',fertilizers:'Organic soil enhancer',materials:'',updated:'Today'},
+  {name:'Shreya',location:'West Bengal',product:'Baskets',contact:'3895572108',status:'Available',min:'10',max:'200',fertilizers:'',materials:'Bamboo, Jute',updated:'Today'},
+  {name:'Ram',location:'Karnataka',product:'Fabric',contact:'6605482390',status:'Available',min:'50m',max:'300m',fertilizers:'',materials:'Cotton, Silk',updated:'Today'}
+];
+const buyers = [
+  {name:'FreshMart Wholesalers',location:'Karnataka',need:'Tomatoes',contact:'8888999977',status:'Active',min:'200kg',max:'1 ton',materials:'Organic preferred',updated:'Today'},
+  {name:'AgroFoods Pvt Ltd',location:'Andhra',need:'Sugarcane',contact:'7777888899',status:'Active',min:'2 tons',max:'10 tons',materials:'Pure cane',updated:'Today'},
+  {name:'Rajesh Wholesalers',location:'Karnataka',need:'Clay Pots',contact:'8647893200',status:'Active',min:'50',max:'500',materials:'Natural clay',updated:'Today'},
+  {name:'PavithraFoods Pvt Ltd',location:'Goa',need:'Onions',contact:'7534578922',status:'Inactive',min:'100kg',max:'600kg',materials:'Fresh red onions',updated:'Today'},
+  {name:'MintMart Wholesalers',location:'Karnataka',need:'Carrots',contact:'8864327790',status:'Active',min:'150kg',max:'700kg',materials:'Organic only',updated:'Today'},
+  {name:'Organic Wholesalers',location:'Karnataka',need:'Mangoes',contact:'9907554557',status:'Active',min:'300kg',max:'2 tons',materials:'Natural mango pulp',updated:'Today'},
+  {name:'FreshProduct',location:'West Bengal',need:'Baskets',contact:'0963045547',status:'Active',min:'20',max:'500',materials:'Jute, Bamboo',updated:'Today'},
+  {name:'Bharath Need',location:'Karnataka',need:'Fabric',contact:'9667883021',status:'Active',min:'30m',max:'400m',materials:'Silk or Cotton',updated:'Today'}
+];
+
+/* =========================
+   Price Table (demo)
+========================= */
+const PRICE_TABLE = {
+  Tomatoes:{Karnataka:[28,36],Andhra:[26,34],Goa:[30,40],"West Bengal":[24,32]},
+  Mangoes:{Karnataka:[60,90],Andhra:[55,85],Goa:[70,110],"West Bengal":[65,95]},
+  Sugarcane:{Karnataka:[2600,3100],Andhra:[2500,3000],Goa:[2700,3200],"West Bengal":[2400,2900]},
+  Onions:{Karnataka:[18,28],Andhra:[16,26],Goa:[22,32],"West Bengal":[14,24]},
+  Potatoes:{Karnataka:[20,28],Andhra:[18,26],Goa:[22,30],"West Bengal":[16,24]},
+  Carrots:{Karnataka:[28,40],Andhra:[26,38],Goa:[30,42],"West Bengal":[24,36]},
+  Baskets:{"West Bengal":[40,120],Karnataka:[45,130],Andhra:[45,130],Goa:[45,130]},
+  Fabric:{Karnataka:[120,260],Andhra:[120,260],Goa:[140,280],"West Bengal":[120,260]},
+  "Clay Pots":{Karnataka:[30,80],Andhra:[30,80],Goa:[35,90],"West Bengal":[28,75]}
+};
+
+/* =========================
+   DOM Refs
+========================= */
+const appRoot = document.getElementById('appRoot');
+const homeView = document.getElementById('homeView');
+const farmerView = document.getElementById('farmerView');
+const buyerView = document.getElementById('buyerView');
+
+const btnFarmers = document.getElementById('btnFarmers');
+const btnBuyers  = document.getElementById('btnBuyers');
+const backFromFarmer = document.getElementById('backFromFarmer');
+const backFromBuyer  = document.getElementById('backFromBuyer');
+
+const buyerForFarmerList = document.getElementById('buyerForFarmerList');
+const farmerForBuyerList = document.getElementById('farmerForBuyerList');
+
+const buyerReqQuery = document.getElementById('buyerReqQuery');
+const buyerLocQuery = document.getElementById('buyerLocQuery');
+const farmerProdQuery = document.getElementById('farmerProdQuery');
+const farmerLocQuery  = document.getElementById('farmerLocQuery');
+
+const toggleFarmerForm = document.getElementById('toggleFarmerForm');
+const toggleBuyerForm  = document.getElementById('toggleBuyerForm');
+const farmerForm = document.getElementById('farmerForm');
+const buyerForm  = document.getElementById('buyerForm');
+
+const addFarmerBtn = document.getElementById('addFarmerBtn');
+const addBuyerBtn  = document.getElementById('addBuyerBtn');
+
+const farmerName = document.getElementById('farmerName');
+const farmerLocation = document.getElementById('farmerLocation');
+const farmerProduct = document.getElementById('farmerProduct');
+const priceHint = document.getElementById('priceHint');
+
+/* =========================
+   View switching
+========================= */
+btnFarmers.onclick = () => { homeView.style.display='none'; buyerView.style.display='none'; farmerView.style.display='block'; renderBuyerCards(); };
+btnBuyers.onclick  = () => { homeView.style.display='none'; farmerView.style.display='none'; buyerView.style.display='block'; renderFarmerCards(); };
+backFromFarmer.onclick = backFromBuyer.onclick = () => { buyerView.style.display='none'; farmerView.style.display='none'; homeView.style.display='block'; };
+
+/* =========================
+   Forms
+========================= */
+toggleFarmerForm.onclick = () => { farmerForm.style.display = farmerForm.style.display==='block'?'none':'block'; };
+toggleBuyerForm.onclick  = () => { buyerForm.style.display  = buyerForm.style.display==='block'?'none':'block'; };
+
+/* Add entries */
+addFarmerBtn.onclick = () => {
+  const date = new Date().toLocaleString();
+  const f = {
+    name: farmerName.value.trim(),
+    location: farmerLocation.value.trim(),
+    product: farmerProduct.value.trim(),
+    contact: document.getElementById('farmerContact').value.trim(),
+    min: document.getElementById('minQty').value.trim(),
+    max: document.getElementById('maxQty').value.trim(),
+    fertilizers: document.getElementById('fertilizers').value.trim(),
+    materials: document.getElementById('materials').value.trim(),
+    status: document.getElementById('availability').value,
+    updated: date
+  };
+  if (f.name && f.location && f.product && f.contact) {
+    farmers.push(f);
+    farmerForm.reset(); priceHint.innerHTML="";
+    farmerForm.style.display='none';
+    renderFarmerCards();
+  }
+};
+
+addBuyerBtn.onclick = () => {
+  const date = new Date().toLocaleString();
+  const b = {
+    name: document.getElementById('buyerName').value.trim(),
+    location: document.getElementById('buyerLocation').value.trim(),
+    need: document.getElementById('buyerNeed').value.trim(),
+    contact: document.getElementById('buyerContact').value.trim(),
+    min: document.getElementById('minQtyBuyer').value.trim(),
+    max: document.getElementById('maxQtyBuyer').value.trim(),
+    materials: document.getElementById('materialsBuyer').value.trim(),
+    status: document.getElementById('availabilityBuyer').value,
+    updated: date
+  };
+  if (b.name && b.location && b.need && b.contact) {
+    buyers.push(b);
+    buyerForm.reset();
+    buyerForm.style.display='none';
+    renderBuyerCards();
+  }
+};
+
+/* =========================
+   i18n (UI + New features)
+========================= */
+let currentLang = 'en';
+const i18n = {
+  en:{ title:"MarketHive 🌾", tagline:"Connecting Farmers, Buyers & Industries",
+    farmerBtn:"Farmers / Small-Scale Industrialists", buyerBtn:"Buyers",
+    farmerForm:"Register New Product", buyerForm:"Register New Buyer Requirement",
+    addProduct:"+ Register New Product", addRequirement:"+ Register New Requirement",
+    addProductSubmit:"Add Product", addRequirementSubmit:"Add Requirement",
+    searchBuyer:"Search Buyer Requirements...", searchFarmer:"Search Farmer Products...", searchByLocation:"Search by Location...",
+    back:"⬅ Back", footer:"Demo App • Made for Viksit Bharat Buildathon 2025",
+    lblNeeds:"Needs", lblProduct:"Product", lblLocation:"Location", lblStatus:"Status", lblNeed:"Need",
+    lblMinQty:"Minimum Quantity", lblMaxQty:"Maximum Quantity", lblFertilizers:"Fertilizers Used", lblMaterials:"Materials Used",
+    lblContact:"Contact", lblUpdated:"Last Updated",
+    notifications_on:"Notifications", notifications_off:"Notifications Off",
+    help:"Help", brightness:"Brightness", sound:"Sound", record:"Screen Record", recordAlert:"🎥 Screen recording feature coming soon!",
+    helpTitle:"🆘 Detailed Guide – How to Use MarketHive",
+    helpList:[
+      "🏠 Home: choose <b>Farmer</b> or <b>Buyer</b>",
+      "🌾 Farmer View: register products with min/max qty, fertilizers, materials",
+      "🛒 Buyer View: register requirements; app matches nearby farmers",
+      "🔍 Search: filter by product & location",
+      "📦 Cards: click for full info popup",
+      "📞 Contact: call or text from popup",
+      "☀️ Brightness / 🔊 Sound adjust the app area only"
+    ],
+    // New features text
+    priceHint:"💡 Suggested price in {loc} for {prod}: ₹{min}–₹{max}",
+    priceNoData:"ℹ️ Enter Product & Location for price suggestion",
+    weather:"Weather", weatherWaiting:"Waiting...", weatherFail:"Add API key or try city name", temp:"Temp", humidity:"Humidity",
+    weatherSample:"Sample: Sunny, 32°C",
+    calcTitleFarmer:"Profit Calculator (Farmer)",
+    calcTitleBuyer:"Profit Calculator (Buyer)",
+    calcCostFarmer:"Cost per unit (₹)", calcCostBuyer:"Buying price per unit (₹)",
+    calcPrice:"Selling price per unit (₹)", calcQty:"Quantity (units)", calcGo:"Calculate",
+    calcRes:"Estimated Profit: ₹{profit}  •  Margin: {margin}%",
+    autoMatchTitle:"Auto Match Results", autoMatchFound:(n)=>`${n} matching farmer(s) found`,
+    chatbotTitle:"Kisan AI Assistant", chatbotPlaceholder:"Ask about crops, prices, tips...", chatbotSend:"Send",
+    chatHello:"Hi! 🌾 I’m Kisan AI. Ask me about crop care, pricing, weather timing, government schemes, logistics, or how to use the app.",
+    chatTipGeneric:"Here’s a useful tip: keep soil slightly moist, add compost every 10–15 days, and watch for early pest signs.",
+    chatPrice:"For fair pricing, assess quality (grade A/B), packaging, and distance. Check local mandi rates; your 💡 suggestion helps.",
+    chatIrrigation:"Irrigation: prefer drip for water efficiency. Morning/evening cycles reduce evaporation.",
+    chatFertilizer:"Balanced NPK with organic compost improves soil life. Do a soil test once per season if you can.",
+    chatDisease:"Common risks: leaf curl (tomato), powdery mildew (mango), blight (potato). Use recommended IPM methods; avoid over-spraying.",
+    chatHarvest:"Harvest in cool hours; pre-cool leafy vegetables; use crates to reduce damage. Plan logistics early.",
+    chatSchemes:"Schemes: PM-Kisan (income support), Agri-credit (KCC), FPO support. Check state portals for current eligibility.",
+    chatWeatherUse:"Use ☀️ Weather in the sidebar: avoid harvest in heavy humidity or rain; plan irrigation 24h ahead of a heat spike.",
+    chatContextJoiner:"Considering your last messages, here’s a tailored suggestion:",
+    chatAskClarify:"Could you tell me the crop and location for a tighter answer?",
+  },
+  hi:{ title:"मार्केटहाइव 🌾", tagline:"किसानों, खरीदारों और उद्योगों को जोड़ना",
+    farmerBtn:"किसान / लघु उद्योगपति", buyerBtn:"खरीदार",
+    farmerForm:"नया उत्पाद पंजीकृत करें", buyerForm:"नया खरीदार आवश्यकता जोड़ें",
+    addProduct:"+ नया उत्पाद पंजीकृत करें", addRequirement:"+ नई खरीदार आवश्यकता पंजीकृत करें",
+    addProductSubmit:"उत्पाद जोड़ें", addRequirementSubmit:"आवश्यकता जोड़ें",
+    searchBuyer:"खरीदार आवश्यकताओं की खोज करें...", searchFarmer:"किसान उत्पाद खोजें...", searchByLocation:"स्थान से खोजें...",
+    back:"⬅ वापस", footer:"डेमो ऐप • विकसित भारत बिल्डाथॉन 2025 के लिए बनाया गया",
+    lblNeeds:"आवश्यकता", lblProduct:"उत्पाद", lblLocation:"स्थान", lblStatus:"स्थिति", lblNeed:"आवश्यकता",
+    lblMinQty:"न्यूनतम मात्रा", lblMaxQty:"अधिकतम मात्रा", lblFertilizers:"प्रयुक्त उर्वरक", lblMaterials:"प्रयुक्त सामग्री",
+    lblContact:"संपर्क", lblUpdated:"अंतिम अपडेट",
+    notifications_on:"सूचनाएँ", notifications_off:"सूचनाएँ बंद",
+    help:"सहायता", brightness:"प्रकाश", sound:"ध्वनि", record:"स्क्रीन रिकॉर्ड", recordAlert:"🎥 स्क्रीन रिकॉर्डिंग सुविधा जल्द आ रही है!",
+    helpTitle:"🆘 विस्तृत मार्गदर्शिका – मार्केटहाइव का उपयोग कैसे करें",
+    helpList:["🏠 होम: <b>किसान</b> या <b>खरीदार</b> चुनें","🌾 किसान दृश्य: न्यूनतम/अधिकतम मात्रा, उर्वरक, सामग्री सहित उत्पाद दर्ज करें","🛒 खरीदार दृश्य: आवश्यकताएँ दर्ज करें; ऐप नज़दीकी किसानों से मिलान करता है","🔍 खोज: उत्पाद और स्थान के आधार पर फ़िल्टर करें","📦 कार्ड: पूरी जानकारी के लिए क्लिक करें","📞 संपर्क: पॉपअप से कॉल या संदेश करें","☀️ प्रकाश / 🔊 ध्वनि केवल ऐप क्षेत्र पर लागू"],
+    priceHint:"💡 {loc} में {prod} का सुझाया मूल्य: ₹{min}–₹{max}",
+    priceNoData:"ℹ️ मूल्य सुझाव के लिए उत्पाद और स्थान दर्ज करें",
+    weather:"मौसम", weatherWaiting:"प्रतीक्षा...", weatherFail:"API कुंजी जोड़ें या शहर आज़माएँ", temp:"तापमान", humidity:"आर्द्रता",
+    weatherSample:"नमूना: धूप, 32°C",
+    calcTitleFarmer:"लाभ कैलकुलेटर (किसान)", calcTitleBuyer:"लाभ कैलकुलेटर (खरीदार)",
+    calcCostFarmer:"प्रति इकाई लागत (₹)", calcCostBuyer:"प्रति इकाई खरीद मूल्य (₹)",
+    calcPrice:"प्रति इकाई विक्रय मूल्य (₹)", calcQty:"मात्रा (इकाइयाँ)", calcGo:"गणना करें",
+    calcRes:"अनुमानित लाभ: ₹{profit}  •  मार्जिन: {margin}%",
+    autoMatchTitle:"स्वचालित मिलान", autoMatchFound:(n)=>`${n} मिलान किसान मिले`,
+    chatbotTitle:"किसान AI सहायक", chatbotPlaceholder:"फसल, कीमत, टिप्स पूछें...", chatbotSend:"भेजें",
+    chatHello:"नमस्ते! 🌾 मैं किसान AI हूँ। फसल-देखभाल, कीमत, मौसम समय, सरकारी योजनाएँ, लॉजिस्टिक्स, या ऐप उपयोग पूछें।",
+    chatTipGeneric:"उपयोगी टिप: मिट्टी हल्की नम रखें, 10–15 दिन में खाद दें, और कीट के शुरुआती संकेत देखें।",
+    chatPrice:"उचित कीमत के लिए गुणवत्ता, पैकेजिंग और दूरी देखें। स्थानीय मंडी दरें देखें; आपका 💡 सुझाव भी मदद करेगा।",
+    chatIrrigation:"सिंचाई: जल बचत हेतु ड्रिप अपनाएँ। सुबह/शाम के चक्र वाष्पीकरण घटाते हैं।",
+    chatFertilizer:"जैविक खाद + संतुलित NPK मिट्टी जीवन बढ़ाता है। सीजन में एक बार मिट्टी जाँच कराएँ।",
+    chatDisease:"सामान्य जोखिम: लीफ-कर्ल (टमाटर), पाउडरी मिल्ड्यू (आम), ब्लाइट (आलू)। IPM अपनाएँ; अत्यधिक स्प्रे से बचें।",
+    chatHarvest:"कटाई ठंडे समय में करें; पत्तेदार सब्जियों को प्रीकूल करें; क्रेट/टोकरियाँ उपयोग करें।",
+    chatSchemes:"योजनाएँ: PM-Kisan, KCC, FPO सहायता — राज्य पोर्टल पर पात्रता देखें।",
+    chatWeatherUse:"साइडबार में ☀️ मौसम देखें: अधिक आर्द्रता/बरसात में कटाई टालें; हीट-स्पाइक से 24 घंटे पहले सिंचाई करें।",
+    chatContextJoiner:"आपके पिछले संदेशों को देखते हुए एक सुझाव:",
+    chatAskClarify:"कृपया फसल और स्थान बताएँ ताकि और सटीक मदद कर सकूँ।",
+  },
+  te:{ title:"మార్కెట్‌హైవ్ 🌾", tagline:"రైతులు, కొనుగోలుదారులు మరియు పరిశ్రమలను కలపడం",
+    farmerBtn:"రైతులు / చిన్న స్థాయి పరిశ్రమలు", buyerBtn:"కొనుగోలుదారులు",
+    farmerForm:"కొత్త ఉత్పత్తిని నమోదు చేయండి", buyerForm:"కొత్త కొనుగోలుదారు అవసరం నమోదు చేయండి",
+    addProduct:"+ కొత్త ఉత్పత్తి నమోదు", addRequirement:"+ కొత్త అవసరం నమోదు",
+    addProductSubmit:"ఉత్పత్తి చేర్చండి", addRequirementSubmit:"అవసరం చేర్చండి",
+    searchBuyer:"కొనుగోలుదారుల అవసరాలు వెతకండి...", searchFarmer:"రైతు ఉత్పత్తులు వెతకండి...", searchByLocation:"ప్రాంతం ద్వారా శోధించండి...",
+    back:"⬅ వెనక్కి", footer:"డెమో యాప్ • వికసిత్ భారత్ బిల్డాథాన్ 2025 కోసం రూపొందించబడింది",
+    lblNeeds:"అవసరం", lblProduct:"ఉత్పత్తి", lblLocation:"ప్రాంతం", lblStatus:"స్థితి", lblNeed:"అవసరం",
+    lblMinQty:"కనిష్ట పరిమాణం", lblMaxQty:"గరిష్ఠ పరిమాణం", lblFertilizers:"వాడిన ఎరువులు", lblMaterials:"వాడిన పదార్థాలు",
+    lblContact:"సంప్రదింపు", lblUpdated:"చివరి నవీకరణ",
+    notifications_on:"నోటిఫికేషన్లు", notifications_off:"నోటిఫికేషన్లు ఆఫ్",
+    help:"సహాయం", brightness:"ప్రకాశం", sound:"శబ్దం", record:"స్క్రీన్ రికార్డ్", recordAlert:"🎥 స్క్రీన్ రికార్డింగ్ త్వరలో వస్తుంది!",
+    helpTitle:"🆘 సమగ్ర మార్గదర్శిని – మార్కెట్‌హైవ్ వినియోగం",
+    helpList:["🏠 హోమ్: <b>రైతు</b> లేదా <b>కొనుగోలుదారు</b> ఎంచుకోండి","🌾 రైతు వ్యూ: కనిష్ట/గరిష్ఠ పరిమాణం, ఎరువులు, పదార్థాలతో ఉత్పత్తి నమోదు","🛒 కొనుగోలుదారు వ్యూ: అవసరాలను నమోదు; యాప్ సమీప రైతులతో మ్యాచ్ చేస్తుంది","🔍 శోధన: ఉత్పత్తి & ప్రాంతం ఆధారంగా ఫిల్టర్","📦 కార్డులు: పూర్తి సమాచారానికి క్లిక్ చేయండి","📞 సంప్రదింపు: పాప్‌అప్ నుంచే కాల్/సందేశం","☀️ ప్రకాశం / 🔊 శబ్దం: యాప్ ప్రాంతానికే వర్తిస్తుంది"],
+    priceHint:"💡 {loc} లో {prod} సూచించిన ధర: ₹{min}–₹{max}",
+    priceNoData:"ℹ️ ధర సూచనకు ఉత్పత్తి & ప్రాంతం ఇవ్వండి",
+    weather:"వాతావరణం", weatherWaiting:"వేచి ఉంది...", weatherFail:"API కీ జోడించండి లేదా నగరం ప్రయత్నించండి", temp:"ఉష్ణోగ్రత", humidity:"ఆర్ద్రత",
+    weatherSample:"నమూనా: ఎండ, 32°C",
+    calcTitleFarmer:"లాభాల గణకం (రైతు)", calcTitleBuyer:"లాభాల గణకం (కొనుగోలుదారు)",
+    calcCostFarmer:"యూనిట్‌కు ఖర్చు (₹)", calcCostBuyer:"యూనిట్ కొనుగోలు ధర (₹)",
+    calcPrice:"యూనిట్ అమ్మక ధర (₹)", calcQty:"పరిమాణం (యూనిట్లు)", calcGo:"లెక్కించు",
+    calcRes:"అంచనా లాభం: ₹{profit}  •  మార్జిన్: {margin}%",
+    autoMatchTitle:"ఆటో మ్యాచ్", autoMatchFound:(n)=>`${n} రైతులు దొరికారు`,
+    chatbotTitle:"కిసాన్ AI సహాయకుడు", chatbotPlaceholder:"పంటలు, ధరలు, సూచనలు అడగండి...", chatbotSend:"పంపు",
+    chatHello:"హలో! 🌾 నేను కిసాన్ AI. పంట సంరక్షణ, ధర, వాతావరణ సమయం, ప్రభుత్వ పథకాలు, లాజిస్టిక్స్ లేదా యాప్ గురించి అడగండి.",
+    chatTipGeneric:"ఉపయోగకరమైన చిట్కా: నేల తడిగా ఉంచండి, 10–15 రోజులకు కంపోస్ట్, పురుగుల లక్షణాలు ముందే గుర్తించండి.",
+    chatPrice:"న్యాయమైన ధర కోసం నాణ్యత, ప్యాకింగ్, దూరం చూడండి. స్థానిక మార్కెట్ రేట్లు చూడండి; 💡 సిఫార్సు బాక్స్ ఉపయోగించండి.",
+    chatIrrigation:"డ్రిప్ ఇరిగేషన్ నీటి పొదుపు. ఉదయం/సాయంత్రం చక్రాలు ఆవిరీభవనం తగ్గిస్తాయి.",
+    chatFertilizer:"సమతుల్య NPK + ఆర్గానిక్ కంపోస్ట్ మట్టిని బలపరుస్తుంది. సీజన్‌కు ఒకసారి మట్టి పరీక్ష చేయండి.",
+    chatDisease:"సాధారణ సమస్యలు: లీఫ్ కర్ల్, పౌడరీ మిల్డ్యూ, బ్లైట్. IPM పాటించండి; అధిక స్ప్రే వద్దు.",
+    chatHarvest:"చల్లని వేళల్లో కోత, ఆకుకూరలకు ప్రీకూలింగ్, క్రేట్లు వాడండి. లాజిస్టిక్స్ ముందుగానే ప్లాన్ చేయండి.",
+    chatSchemes:"పథకాలు: PM-Kisan, KCC, FPO మద్దతు — రాష్ట్ర పోర్టల్‌లో చూడండి.",
+    chatWeatherUse:"సైడ్బార్‌లో ☀️ వాతావరణాన్ని చూడండి; వర్షం/భారితనంలో కోత నివారించండి; వేడి ముందు రోజు నీరుపోసండి.",
+    chatContextJoiner:"మీ గత సందేశాల దృష్ట్యా ఒక ప్రత్యేక సూచన:",
+    chatAskClarify:"క్రాప్ & ప్రాంతం చెబితే మరింత సరిగ్గా చెప్పగలను.",
+  },
+  kn:{ title:"ಮಾರ್ಕೆಟ್‌ಹೈವ್ 🌾", tagline:"ರೈತರು, ಖರೀದಿದಾರರು ಮತ್ತು ಕೈಗಾರಿಕೆಗಳನ್ನು ಸಂಪರ್ಕಿಸುವುದು",
+    farmerBtn:"ರೈತರು / ಸಣ್ಣ ಕೈಗಾರಿಕೋಧ್ಯಮಿಗಳು", buyerBtn:"ಖರೀದಿದಾರರು",
+    farmerForm:"ಹೊಸ ಉತ್ಪನ್ನವನ್ನು ನೋಂದಾಯಿಸಿ", buyerForm:"ಹೊಸ ಖರೀದಿದಾರರ ಅಗತ್ಯ ನೋಂದಾಯಿಸಿ",
+    addProduct:"+ ಹೊಸ ಉತ್ಪನ್ನ ನೋಂದಣಿ", addRequirement:"+ ಹೊಸ ಅಗತ್ಯ ನೋಂದಣಿ",
+    addProductSubmit:"ಉತ್ಪನ್ನ ಸೇರಿಸಿ", addRequirementSubmit:"ಅಗತ್ಯ ಸೇರಿಸಿ",
+    searchBuyer:"ಖರೀದಿದಾರರ ಅಗತ್ಯಗಳನ್ನು ಹುಡುಕಿ...", searchFarmer:"ರೈತರ ಉತ್ಪನ್ನಗಳನ್ನು ಹುಡುಕಿ...", searchByLocation:"ಸ್ಥಳದಿಂದ ಹುಡುಕಿ...",
+    back:"⬅ ಹಿಂತಿರುಗಿ", footer:"ಡೆಮೋ ಆಪ್ • ವಿಕಸಿತ್ ಭಾರತ ಬಿಲ್ಡಾಥಾನ್ 2025 ಗಾಗಿ ನಿರ್ಮಿಸಲಾಗಿದೆ",
+    lblNeeds:"ಅಗತ್ಯ", lblProduct:"ಉತ್ಪನ್ನ", lblLocation:"ಸ್ಥಳ", lblStatus:"ಸ್ಥಿತಿ", lblNeed:"ಅಗತ್ಯ",
+    lblMinQty:"ಕನಿಷ್ಠ ಪ್ರಮಾಣ", lblMaxQty:"ಗರಿಷ್ಠ ಪ್ರಮಾಣ", lblFertilizers:"ಬಳಸಿದ ಗೊಬ್ಬರ", lblMaterials:"ಬಳಸಿದ ವಸ್ತುಗಳು",
+    lblContact:"ಸಂಪರ್ಕ", lblUpdated:"ಕೊನೆಯ ನವೀಕರಣ",
+    notifications_on:"ಅಧಿಸೂಚನೆಗಳು", notifications_off:"ಅಧಿಸೂಚನೆಗಳು ಆಫ್",
+    help:"ಸಹಾಯ", brightness:"ಬೆಳಕು", sound:"ಧ್ವನಿ", record:"ಸ್ಕ್ರೀನ್ ರೆಕಾರ್ಡ್", recordAlert:"🎥 ಸ್ಕ್ರೀನ್ ರೆಕಾರ್ಡಿಂಗ್ ಶೀಘ್ರದಲ್ಲೇ!",
+    helpTitle:"🆘 ವಿವರವಾದ ಮಾರ್ಗದರ್ಶಿ – ಮಾರ್ಕೆಟ್‌ಹೈವ್ ಬಳಕೆ",
+    helpList:["🏠 ಮುಖಪುಟ: <b>ರೈತ</b> ಅಥವಾ <b>ಖರೀದಿದಾರ</b> ಆಯ್ಕೆಮಾಡಿ","🌾 ರೈತ ವೀಕ್ಷಣೆ: ಕನಿಷ್ಠ/ಗರಿಷ್ಠ ಪ್ರಮಾಣ, ಗೊಬ್ಬರ, ವಸ್ತುಗಳೊಂದಿಗೆ ಉತ್ಪನ್ನ ನೋಂದಣಿ","🛒 ಖರೀದಿದಾರ ವೀಕ್ಷಣೆ: ಅಗತ್ಯ ನೋಂದಣಿ; ಆಪ್ ಹತ್ತಿರದ ರೈತರೊಂದಿಗೆ ಹೊಂದಿಸುತ್ತದೆ","🔍 ಹುಡುಕಿ: ಉತ್ಪನ್ನ & ಸ್ಥಳ ಆಧಾರಿತ ಫಿಲ್ಟರ್","📦 ಕಾರ್ಡ್‌ಗಳು: ಸಂಪೂರ್ಣ ಮಾಹಿತೆಗೆ ಕ್ಲಿಕ್ ಮಾಡಿ","📞 ಸಂಪರ್ಕ: ಪಾಪ್‌ಅಪ್‌ನಿಂದಲೇ ಕಾಲ್/ಸಂದೇಶ","☀️ ಬೆಳಕು / 🔊 ಧ್ವನಿ: ಆಪ್ ಭಾಗಕ್ಕಷ್ಟೇ ಅನ್ವಯಿಸುತ್ತದೆ"],
+    priceHint:"💡 {loc} ನಲ್ಲಿ {prod} ಶಿಫಾರಸು ಬೆಲೆ: ₹{min}–₹{max}",
+    priceNoData:"ℹ️ ಬೆಲೆ ಸಲಹೆಗೆ ಉತ್ಪನ್ನ ಮತ್ತು ಸ್ಥಳ ನೀಡಿ",
+    weather:"ಹವಾಮಾನ", weatherWaiting:"ಕಾಯುತ್ತಿದೆ...", weatherFail:"API ಕೀ ಸೇರಿಸಿ ಅಥವಾ ನಗರ ಪ್ರಯತ್ನಿಸಿ", temp:"ತಾಪಮಾನ", humidity:"ಆರ್ದ್ರತೆ",
+    weatherSample:"ಮಾದರಿ: ಬಿಸಿಲು, 32°C",
+    calcTitleFarmer:"ಲಾಭ ಗಣಕ (ರೈತ)", calcTitleBuyer:"ಲಾಭ ಗಣಕ (ಖರೀದಿದಾರ)",
+    calcCostFarmer:"ಘಟಕಕ್ಕೆ ವೆಚ್ಚ (₹)", calcCostBuyer:"ಘಟಕಕ್ಕೆ ಖರೀದಿ ಬೆಲೆ (₹)",
+    calcPrice:"ಘಟಕಕ್ಕೆ ಮಾರಾಟ ಬೆಲೆ (₹)", calcQty:"ಪ್ರಮಾಣ (ಘಟಕಗಳು)", calcGo:"ಲೆಕ್ಕಿಸಿ",
+    calcRes:"ಅಂದಾಜು ಲಾಭ: ₹{profit}  •  ಮಾರ್ಜಿನ್: {margin}%",
+    autoMatchTitle:"ಸ್ವಯಂ ಹೊಂದಿಕೆ", autoMatchFound:(n)=>`${n} ರೈತರು ಕಂಡುಬಂದಿದ್ದಾರೆ`,
+    chatbotTitle:"ಕಿಸಾನ್ AI ಸಹಾಯಕ", chatbotPlaceholder:"ಬೆಳೆ, ಬೆಲೆ, ಸಲಹೆ ಕೇಳಿ...", chatbotSend:"ಕಳುಹಿಸಿ",
+    chatHello:"ನಮಸ್ಕಾರ! 🌾 ನಾನು ಕಿಸಾನ್ AI. ಬೆಳೆ, ಬೆಲೆ, ಹವಾಮಾನ, ಯೋಜನೆಗಳು, ಲಾಜಿಸ್ಟಿಕ್ಸ್ ಅಥವಾ ಆಪ್ ಬಗ್ಗೆ ಕೇಳಿ.",
+    chatTipGeneric:"ಉಪಯುಕ್ತ ಸಲಹೆ: ಮಣ್ಣು ಸ್ವಲ್ಪ ತೇವವಾಗಿರಲಿ, 10–15 ದಿನಕ್ಕೆ ಕಂಪೋಸ್ಟ್, ಕೀಟ ಸಂಕೆತಗಳನ್ನು ಮುಂಚಿತವಾಗಿ ಗಮನಿಸಿ.",
+    chatPrice:"ನ್ಯಾಯ ಬೆಲೆಗಾಗಿ ಗುಣಮಟ್ಟ, ಪ್ಯಾಕಿಂಗ್, ದೂರ ಗಮನಿಸಿ. ಸ್ಥಳೀಯ ಮಾರುಕಟ್ಟೆ ದರ ನೋಡಿ; 💡 ಸೂಚನೆ ಸಹಾಯಕ.",
+    chatIrrigation:"ಡ್ರಿಪ್ ನೀರಾವರಿ ನೀರನ್ನು ಉಳಿಸುತ್ತದೆ. ಬೆಳಿಗ್ಗೆ/ಸಂಜೆ ಚಕ್ರಗಳು ಆವೇಶೀಕರಣ ಕಡಿಮೆ ಮಾಡುತ್ತವೆ.",
+    chatFertilizer:"ಸಮತೋಲನ NPK ಮತ್ತು ಜೈವ ಗೊಬ್ಬರ ಮಣ್ಣಿಗೆ ಒಳ್ಳೆಯದು. ಋತುವಿಗೆ ಒಮ್ಮೆ ಮಣ್ಣು ಪರೀಕ್ಷೆ ಮಾಡಿ.",
+    chatDisease:"ಸಾಧಾರಣ: ಲೀಫ್ ಕರ್, ಪೌಡರಿ ಮಿಲ್ಡ್ಯೂ, ಬ್ಲೈಟ್. IPM ಅನುಸರಿಸಿ; ಅಧಿಕ ಸಿಂಪಡಣೆ ತಪ್ಪಿಸಿ.",
+    chatHarvest:"ತಂಪಾದ ಹೊತ್ತಿನಲ್ಲಿ ಕೊಯ್ಲು; ಹಸಿರು ತರಕಾರಿಗಳಿಗೆ ಪೂರ್ವ ತಣ್ಣಗೊಳಿಕೆ; ಕ್ರೇಟ್ ಬಳಸಿ.",
+    chatSchemes:"ಯೋಜನೆಗಳು: PM-Kisan, KCC, FPO ಬೆಂಬಲ — ರಾಜ್ಯ ಪೋರ್ಟಲ್ ಪರಿಶೀಲಿಸಿ.",
+    chatWeatherUse:"☀️ ಹವಾಮಾನ ವಿಭಾಗ ನೋಡಿ; ಮಳೆ/ಆರ್ದ್ರತೆಯಲ್ಲಿ ಕೊಯ್ಲು ಬೇಡ; ಉಷ್ಣತೆಯ ಮುನ್ನ ದಿನ ನೀರುಪೂರೈಕೆ.",
+    chatContextJoiner:"ನಿಮ್ಮ ಹಿಂದಿನ ಸಂದೇಶ ಆಧರಿಸಿ ಒಂದು ಸೂಚನೆ:",
+    chatAskClarify:"ಬೆಳೆ ಮತ್ತು ಸ್ಥಳ ತಿಳಿಸಿದರೆ ಇನ್ನೂ ನಿಖರವಾಗಿ ಹೇಳುತ್ತೇನೆ.",
+  },
+  ta:{ title:"மார்க்கெட்ஹைவ் 🌾", tagline:"விவசாயிகள், வாங்குவோர் மற்றும் தொழில்களை இணைத்தல்",
+    farmerBtn:"விவசாயிகள் / சிறு தொழிலதிபர்கள்", buyerBtn:"வாங்குவோர்",
+    farmerForm:"புதிய தயாரிப்பை பதிவு செய்யவும்", buyerForm:"புதிய வாங்குபவர் தேவையை பதிவு செய்யவும்",
+    addProduct:"+ புதிய தயாரிப்பு பதிவு", addRequirement:"+ புதிய தேவையை பதிவு",
+    addProductSubmit:"தயாரிப்பு சேர்க்கவும்", addRequirementSubmit:"தேவை சேர்க்கவும்",
+    searchBuyer:"வாங்குபவர் தேவைகளை தேடுங்கள்...", searchFarmer:"விவசாயிகள் தயாரிப்புகளை தேடுங்கள்...", searchByLocation:"இடம்படி தேடுங்கள்...",
+    back:"⬅ திரும்ப", footer:"டெமோ ஆப் • விக்சித் பாரத் பில்டத்தான் 2025 க்காக உருவாக்கப்பட்டது",
+    lblNeeds:"தேவை", lblProduct:"தயாரிப்பு", lblLocation:"இடம்", lblStatus:"நிலை", lblNeed:"தேவை",
+    lblMinQty:"குறைந்தபட்ச அளவு", lblMaxQty:"அதிகபட்ச அளவு", lblFertilizers:"பயன்படுத்திய உரங்கள்", lblMaterials:"பயன்படுத்திய பொருட்கள்",
+    lblContact:"தொடர்பு", lblUpdated:"கடைசியாக புதுப்பித்தது",
+    notifications_on:"அறிவிப்புகள்", notifications_off:"அறிவிப்புகள் நிறுத்தம்",
+    help:"உதவி", brightness:"ஒளி", sound:"ஒலி", record:"திரை பதிவு", recordAlert:"🎥 திரை பதிவு விரைவில் வருகிறது!",
+    helpTitle:"🆘 விரிவான வழிகாட்டி – மார்க்கெட்ஹைவ் பயன்பாடு",
+    helpList:["🏠 முகப்பு: <b>விவசாயி</b> அல்லது <b>வாங்குவர்</b> தேர்வு","🌾 விவசாயி: குறை/அதி அளவு, உரங்கள், பொருட்கள்","🛒 வாங்குவர்: தேவைகளை பதிவு; அருகினில் உள்ள விவசாயிகளுடன் பொருத்தம்","🔍 தேடல்: தயாரிப்பு & இடம்","📦 கார்டுகள்: முழு தகவலுக்கு கிளிக்","📞 தொடர்பு: பாப்பப் மூலம் அழை/செய்தி","☀️ ஒளி / 🔊 ஒலி: ஆப்பில் மட்டும்"],
+    priceHint:"💡 {loc} இல் {prod} பரிந்துரைக்கப்பட்ட விலை: ₹{min}–₹{max}",
+    priceNoData:"ℹ️ விலை பரிந்துரைக்கு தயாரிப்பு & இடம் நிரப்பவும்",
+    weather:"வானிலை", weatherWaiting:"காத்திருக்கிறது...", weatherFail:"API விசை சேர்க்கவும் அல்லது நகரம் முயலவும்", temp:"வெப்பநிலை", humidity:"ஈரப்பதம்",
+    weatherSample:"மாதிரி: வெயில், 32°C",
+    calcTitleFarmer:"ஆதாயக் கணிப்பான் (விவசாயி)", calcTitleBuyer:"ஆதாயக் கணிப்பான் (வாங்குவர்)",
+    calcCostFarmer:"ஒன்றுக்கு செலவு (₹)", calcCostBuyer:"ஒன்றுக்கு கொள்முதல் விலை (₹)",
+    calcPrice:"ஒன்றுக்கு விற்பனை விலை (₹)", calcQty:"அளவு (அலகுகள்)", calcGo:"கணக்கிடு",
+    calcRes:"மதிப்பிடப்பட்ட ஆதாயம்: ₹{profit}  •  விகிதம்: {margin}%",
+    autoMatchTitle:"தானியங்கு பொருத்தம்", autoMatchFound:(n)=>`${n} விவசாயிகள் கிடைத்தனர்`,
+    chatbotTitle:"கிசான் AI உதவியாளர்", chatbotPlaceholder:"பயிர், விலை, குறிப்புகள் கேளுங்கள்...", chatbotSend:"அனுப்பு",
+    chatHello:"வணக்கம்! 🌾 நான் கிசான் AI. பயிர் பராமரிப்பு, விலை, வானிலை நேரம், அரசு திட்டங்கள், லாஜிஸ்டிக்ஸ், அல்லது பயன்பாடு குறித்து கேளுங்கள்.",
+    chatTipGeneric:"பயனுள்ள குறிப்பு: மண்ணை சற்றே ஈரமாக வைத்துக் கொள்ளுங்கள்; 10–15 நாட்களுக்கு ஒருமுறை கம்போஸ்ட்; பூச்சி அறிகுறிகளை முன் கவனியுங்கள்.",
+    chatPrice:"நியாயமான விலைக்கு தரம், பேக்கிங், தூரம் பார்க்கவும். உள்ளூர் சந்தை விலைகளையும், 💡 பரிந்துரையையும் பார்க்கவும்.",
+    chatIrrigation:"ட்ரிப் பாசனம் தண்ணீர் சேமிக்கும். காலை/மாலை பாசனம் ஆவியாக்கத்தைக் குறைக்கும்.",
+    chatFertilizer:"சமநிலை NPK + உயிரி உரம் மண் ஆரோக்கியத்தை மேம்படுத்தும். சீசனுக்கு ஒருமுறை மண் பரிசோதனை செய்யவும்.",
+    chatDisease:"பொதுவானவை: லீஃப்-கர்ல், பவுடரி மில்டியூ, பிளைட். IPM பின்பற்றவும்; அதிக ஸ்ப்ரே தவிர்க்கவும்.",
+    chatHarvest:"குளிர் நேரத்தில் அறுவடை; இலைக்கறிகளுக்கு முன் குளிர்வு; கிரேட் பயன்படுத்தவும்.",
+    chatSchemes:"திட்டங்கள்: PM-Kisan, KCC, FPO ஆதரவு — மாநில தளத்தைச் சரிபார்க்கவும்.",
+    chatWeatherUse:"☀️ வானிலை பகுதியைப் பயன்படுத்தி திட்டமிடுங்கள்; மழை/ஈரப்பதத்தில் அறுவடை தவிர்க்கவும்; வெப்ப அலைக்கு முன் நாள் பாசனம்.",
+    chatContextJoiner:"உங்கள் முந்தைய செய்திகளை வைத்து சிறப்பு ஆலோசனை:",
+    chatAskClarify:"பயிர் & இடம் சொன்னால் இன்னும் துல்லியமாக உதவுவேன்.",
+  },
+  bn:{ title:"মার্কেটহাইভ 🌾", tagline:"কৃষক, ক্রেতা ও শিল্পকে সংযুক্ত করা",
+    farmerBtn:"কৃষক / ক্ষুদ্র শিল্পপতি", buyerBtn:"ক্রেতা",
+    farmerForm:"নতুন পণ্য নিবন্ধন করুন", buyerForm:"নতুন ক্রেতার প্রয়োজন যোগ করুন",
+    addProduct:"+ নতুন পণ্য নিবন্ধন", addRequirement:"+ নতুন প্রয়োজন নিবন্ধন",
+    addProductSubmit:"পণ্য যোগ করুন", addRequirementSubmit:"প্রয়োজন যোগ করুন",
+    searchBuyer:"ক্রেতার প্রয়োজন অনুসন্ধান করুন...", searchFarmer:"কৃষক পণ্য অনুসন্ধান করুন...", searchByLocation:"অবস্থান অনুযায়ী অনুসন্ধান...",
+    back:"⬅ ফিরে যান", footer:"ডেমো অ্যাপ • বিকসিত ভারত বিল্ডাথন ২০২৫ এর জন্য তৈরি",
+    lblNeeds:"প্রয়োজন", lblProduct:"পণ্য", lblLocation:"অবস্থান", lblStatus:"অবস্থা", lblNeed:"প্রয়োজন",
+    lblMinQty:"ন্যূনতম পরিমাণ", lblMaxQty:"সর্বোচ্চ পরিমাণ", lblFertilizers:"ব্যবহৃত সার", lblMaterials:"ব্যবহৃত উপকরণ",
+    lblContact:"যোগাযোগ", lblUpdated:"সর্বশেষ হালনাগাদ",
+    notifications_on:"বিজ্ঞপ্তি", notifications_off:"বিজ্ঞপ্তি বন্ধ",
+    help:"সহায়তা", brightness:"আলো", sound:"শব্দ", record:"স্ক্রিন রেকর্ড", recordAlert:"🎥 স্ক্রিন রেকর্ড শীঘ্রই আসছে!",
+    helpTitle:"🆘 বিস্তারিত নির্দেশিকা – মার্কেটহাইভ ব্যবহার",
+    helpList:["🏠 হোম: <b>কৃষক</b> বা <b>ক্রেতা</b> নির্বাচন করুন","🌾 কৃষক: ন্যূনতম/সর্বোচ্চ পরিমাণ, সার, উপকরণসহ","🛒 ক্রেতা: প্রয়োজন নিবন্ধন; নিকটস্থ কৃষকের সাথে মিল","🔍 অনুসন্ধান: পণ্য ও অবস্থান","📦 কার্ড: ক্লিক করে তথ্য দেখুন","📞 যোগাযোগ: পপআপ থেকে কল/বার্তা","☀️ আলো / 🔊 শব্দ: শুধু অ্যাপ এলাকায়"],
+    priceHint:"💡 {loc} এ {prod} এর প্রস্তাবিত দাম: ₹{min}–₹{max}",
+    priceNoData:"ℹ️ দাম পরামর্শের জন্য পণ্য ও অবস্থান দিন",
+    weather:"আবহাওয়া", weatherWaiting:"অপেক্ষা...", weatherFail:"API কী যোগ করুন বা শহর দিন", temp:"তাপমাত্রা", humidity:"আর্দ্রতা",
+    weatherSample:"নমুনা: রোদ, 32°C",
+    calcTitleFarmer:"লাভ ক্যালকুলেটর (কৃষক)", calcTitleBuyer:"লাভ ক্যালকুলেটর (ক্রেতা)",
+    calcCostFarmer:"একক প্রতি খরচ (₹)", calcCostBuyer:"একক প্রতি ক্রয়মূল্য (₹)",
+    calcPrice:"একক প্রতি বিক্রয়মূল্য (₹)", calcQty:"পরিমাণ (একক)", calcGo:"হিসাব",
+    calcRes:"আনুমানিক লাভ: ₹{profit}  •  মার্জিন: {margin}%",
+    autoMatchTitle:"স্বয়ংক্রিয় মিল", autoMatchFound:(n)=>`${n} জন কৃষক মিলেছে`,
+    chatbotTitle:"কিষান AI সহকারী", chatbotPlaceholder:"ফসল, দাম, টিপস জিজ্ঞেস করুন...", chatbotSend:"পাঠান",
+    chatHello:"হাই! 🌾 আমি কিষান AI। ফসল যত্ন, দাম, আবহাওয়া সময়, সরকারি স্কিম, লজিস্টিকস বা অ্যাপ নিয়ে জিজ্ঞেস করুন।",
+    chatTipGeneric:"টিপ: মাটি হালকা স্যাঁতসেঁতে রাখুন, ১০–১৫ দিনে কম্পোস্ট দিন, আগেভাগে পোকার লক্ষণ দেখুন।",
+    chatPrice:"ন্যায্য দামের জন্য গুণমান, প্যাকিং, দূরত্ব দেখুন। স্থানীয় বাজারমূল্য দেখুন; 💡 প্রস্তাবিত দাম সহায়ক।",
+    chatIrrigation:"ড্রিপ সেচে জল সাশ্রয় হয়। সকাল/বিকেলের সেচে বাষ্পীভবন কমে।",
+    chatFertilizer:"সামঞ্জস্যপূর্ণ NPK + জৈব কম্পোস্ট মাটিকে ভালো রাখে। মৌসুমে একবার মাটি পরীক্ষা করুন।",
+    chatDisease:"সাধারণ: লীফ-কার্ল, পাউডারি মিলডিউ, ব্লাইট। IPM অনুসরণ করুন; অতিরিক্ত স্প্রে এড়ান।",
+    chatHarvest:"ঠান্ডা সময়ে ফসল কাটুন; পাতাজাতীয়তে প্রিকুল; ক্রেট ব্যবহার করুন।",
+    chatSchemes:"স্কিম: PM-Kisan, KCC, FPO সাপোর্ট — রাজ্য পোর্টালে দেখুন।",
+    chatWeatherUse:"সাইডবারে ☀️ আবহাওয়া দেখুন; বৃষ্টি/আর্দ্রতায় কাটাই এড়ান; তাপপ্রবাহের আগে সেচ দিন।",
+    chatContextJoiner:"আপনার শেষ বার্তাগুলির ভিত্তিতে একটি পরামর্শ:",
+    chatAskClarify:"ফসল ও অবস্থান বললে আরও নির্ভুলভাবে বলবো।",
+  }
+};
+function t(key,...rest){ const v=i18n[currentLang][key]; return typeof v==='function'?v(...rest):v; }
+
+/* =========================
+   Data dictionaries for translation
+========================= */
+const DATA = {
+  products:{ en:{Tomatoes:"Tomatoes",Mangoes:"Mangoes",Sugarcane:"Sugarcane",Onions:"Onions",Potatoes:"Potatoes",Carrots:"Carrots",Baskets:"Baskets",Fabric:"Fabric","Clay Pots":"Clay Pots"},
+            hi:{Tomatoes:"टमाटर",Mangoes:"आम",Sugarcane:"गन्ना",Onions:"प्याज",Potatoes:"आलू",Carrots:"गाजर",Baskets:"टोकरी",Fabric:"कपड़ा","Clay Pots":"मिट्टी के बर्तन"},
+            te:{Tomatoes:"టమోటాలు",Mangoes:"మామిడి",Sugarcane:"చెరకు",Onions:"ఉల్లిపాయలు",Potatoes:"బంగాళదుంపలు",Carrots:"క్యారెట్‌లు",Baskets:"బుట్టలు",Fabric:"బట్ట","Clay Pots":"మట్టి పాత్రలు"},
+            kn:{Tomatoes:"ಟೊಮೆಟೋಗಳು",Mangoes:"ಮಾವುಗಳು",Sugarcane:"ಕರಿಬೇಲು",Onions:"ಈರುಳ್ಳಿ",Potatoes:"ಆಲೂಗಡ್ಡೆ",Carrots:"ಕ್ಯಾರೆಟ್‌ಗಳು",Baskets:"ಗೂಣಿಗಳು",Fabric:"ಬಟ್ಟೆ","Clay Pots":"ಮಣ್ಣಿನ ಪಾತ್ರೆಗಳು"},
+            ta:{Tomatoes:"தக்காளி",Mangoes:"மாம்பழம்",Sugarcane:"கரும்பு",Onions:"வெங்காயம்",Potatoes:"உருளைக்கிழங்கு",Carrots:"காரட்",Baskets:"கூடைகள்",Fabric:"துணி","Clay Pots":"மண் பானைகள்"},
+            bn:{Tomatoes:"টমেটো",Mangoes:"আম",Sugarcane:"আখ",Onions:"পেঁয়াজ",Potatoes:"আলু",Carrots:"গাজর",Baskets:"ঝুড়ি",Fabric:"কাপড়","Clay Pots":"মাটির হাঁড়ি"} },
+  locations:{ en:{Karnataka:"Karnataka",Andhra:"Andhra",Goa:"Goa","West Bengal":"West Bengal"},
+             hi:{Karnataka:"कर्नाटक",Andhra:"आंध्र",Goa:"गोवा","West Bengal":"पश्चिम बंगाल"},
+             te:{Karnataka:"కర్నాటక",Andhra:"ఆంధ్ర",Goa:"గోవా","West Bengal":"పశ్చిమ బెంగాల్"},
+             kn:{Karnataka:"ಕರ್ನಾಟಕ",Andhra:"ಆಂಧ್ರ",Goa:"ಗೋವಾ","West Bengal":"ಪಶ್ಚಿಮ ಬಂಗಾಳ"},
+             ta:{Karnataka:"கர்நாடகா",Andhra:"ஆந்திரா",Goa:"கோவா","West Bengal":"পশ্চিমবঙ্গ"},
+             bn:{Karnataka:"কর্ণাটক",Andhra:"ఆন্ধ్ర",Goa:"গোয়া","West Bengal":"পশ্চিমবঙ্গ"} },
+  status:{ en:{Available:"Available","Out of Stock":"Out of Stock",Active:"Active",Inactive:"Inactive"},
+           hi:{Available:"उपलब्ध","Out of Stock":"स्टॉक समाप्त",Active:"सक्रिय",Inactive:"निष्क्रिय"},
+           te:{Available:"లభ్యం","Out of Stock":"స్టాక్ లేదు",Active:"సక్రియం",Inactive:"నిష్క్రియం"},
+           kn:{Available:"ಲಭ್ಯ","Out of Stock":"ಸಾಗಣೆ ಇಲ್ಲ",Active:"ಸಕ್ರಿಯ",Inactive:"ಅಕ್ರಿಯ"},
+           ta:{Available:"கிடைக்கிறது","Out of Stock":"சரக்கு இல்லை",Active:"செயலில்",Inactive:"செயலற்றது"},
+           bn:{Available:"উপলব্ধ","Out of Stock":"স্টক শেষ",Active:"সক্রিয়",Inactive:"নিষ্ক্রিয়"} },
+  units:{ en:{kg:"kg","tons":"tons","ton":"ton","m":"m","Today":"Today"},
+          hi:{kg:"किलो","tons":"टन","ton":"टन","m":"मी.","Today":"आज"},
+          te:{kg:"కిలో","tons":"టన్నులు","ton":"టన్ను","m":"మీ.","Today":"ఈరోజు"},
+          kn:{kg:"ಕೆಜಿ","tons":"ಟನ್ನುಗಳು","ton":"ಟನ್","m":"ಮೀ.","Today":"ಇಂದು"},
+          ta:{kg:"கி.கி.","tons":"டன்","ton":"டன்","m":"மீ.","Today":"இன்று"},
+          bn:{kg:"কেজি","tons":"টন","ton":"টন","m":"মি.","Today":"আজ"} }
+};
+function lookup(dict,val){ const d=dict[currentLang]||{}; if(d[val]!=null) return d[val]; const k=Object.keys(d).find(k=>k.toLowerCase()===String(val).toLowerCase()); return k?d[k]:val; }
+function translateValue(val){
+  let out=String(val);
+  out=out.split(',').map(part=>{
+    let p=part.trim();
+    p=p.replace(/(\d+)\s*(kg|tons|ton|m)\b/gi,(m,num,u)=>`${num} ${lookup(DATA.units,u)}`);
+    if(/^Today$/i.test(p)) p=lookup(DATA.units,"Today");
+    let t=lookup(DATA.products,p); if(t===p) t=lookup(DATA.locations,p); return t;
+  }).join(', ');
+  return out;
+}
+function translateStatusWord(s){ return lookup(DATA.status,s); }
+
+/* =========================
+   Renderers
+========================= */
+function computeFarmerCounts(){ const counts={}; farmers.forEach(f=>counts[f.name]=(counts[f.name]||0)+1); return counts; }
+function renderBuyerCards(list = buyers){
+  buyerForFarmerList.innerHTML='';
+  list.forEach(b=>{
+    const el=document.createElement('div'); el.className='card';
+    el.innerHTML = `<h3>${b.name}</h3>
+      <p><b>${t('lblNeeds')}:</b> ${translateValue(b.need)}</p>
+      <p class="muted"><b>${t('lblLocation')}:</b> ${translateValue(b.location)}</p>`;
+    el.onclick=()=>openInfoModal(b);
+    buyerForFarmerList.appendChild(el);
+  });
+}
+function renderFarmerCards(list = farmers){
+  const counts=computeFarmerCounts();
+  farmerForBuyerList.innerHTML='';
+  list.forEach(f=>{
+    const el=document.createElement('div'); el.className='card';
+    const badge = (counts[f.name]>=2) ? `<span class="badge">✅ ${currentLang==='en'?'Verified':'✔'}</span>` : '';
+    el.innerHTML = `<h3>${f.name} ${badge}</h3>
+      <p><b>${t('lblProduct')}:</b> ${translateValue(f.product)}</p>
+      <p class="muted"><b>${t('lblLocation')}:</b> ${translateValue(f.location)}</p>`;
+    el.onclick=()=>openInfoModal(f);
+    farmerForBuyerList.appendChild(el);
+  });
+}
+
+/* =========================
+   Search (language-agnostic)
+========================= */
+function reverse(dict,local){ const mapL=dict[currentLang]||{}, mapE=dict.en||{}; const txt=local.toLowerCase(); for(const k in mapE){ const v=mapL[k]; if(v && v.toLowerCase()===txt) return k.toLowerCase(); } return null; }
+function canonical(q){ const txt=String(q||'').toLowerCase().trim(); return reverse(DATA.products,txt)||reverse(DATA.locations,txt)||txt; }
+function searchBuyerForFarmerFn(){ const p=canonical(buyerReqQuery.value), l=canonical(buyerLocQuery.value); renderBuyerCards(buyers.filter(b=>(!p||b.need.toLowerCase().includes(p))&&(!l||b.location.toLowerCase().includes(l)))); }
+function searchFarmerForBuyerFn(){ const p=canonical(farmerProdQuery.value), l=canonical(farmerLocQuery.value); renderFarmerCards(farmers.filter(f=>(!p||f.product.toLowerCase().includes(p))&&(!l||f.location.toLowerCase().includes(l)))); }
+buyerReqQuery.addEventListener('input', searchBuyerForFarmerFn);
+buyerLocQuery.addEventListener('input', searchBuyerForFarmerFn);
+farmerProdQuery.addEventListener('input', searchFarmerForBuyerFn);
+farmerLocQuery.addEventListener('input', searchFarmerForBuyerFn);
+
+/* =========================
+   Modal
+========================= */
+const infoModal=document.getElementById('infoModal');
+const modalContent=document.getElementById('modalContent');
+function openInfoModal(data){
+  const isFarmer=!!data.product;
+  const statusClass=(/available|active/i.test(data.status))?'status-green':'status-red';
+  const lines=[
+    `<button id="closeModal">✖</button>`,
+    `<h2>${data.name||'-'}</h2>`,
+    (data.status?`<p><b>${t('lblStatus')}:</b> <span class="${statusClass}">${translateStatusWord(data.status)}</span></p>`:''),
+    (data.location?`<p><b>${t('lblLocation')}:</b> ${translateValue(data.location)}</p>`:''),
+    (isFarmer?`<p><b>${t('lblProduct')}:</b> ${translateValue(data.product)}</p>`:(data.need?`<p><b>${t('lblNeed')}:</b> ${translateValue(data.need)}</p>`:'')),
+    (data.min?`<p><b>${t('lblMinQty')}:</b> ${translateValue(data.min)}</p>`:''),
+    (data.max?`<p><b>${t('lblMaxQty')}:</b> ${translateValue(data.max)}</p>`:''),
+    (data.fertilizers?`<p><b>${t('lblFertilizers')}:</b> ${translateValue(data.fertilizers)}</p>`:''),
+    (data.materials?`<p><b>${t('lblMaterials')}:</b> ${translateValue(data.materials)}</p>`:''),
+    (data.contact?`<p><b>${t('lblContact')}:</b> ${data.contact}</p>`:''),
+    (data.updated?`<p><i>${t('lblUpdated')}: ${lookup(DATA.units,"Today")}</i></p>`:''),
+    `<div class="modal-actions">
+      ${data.contact?`<a href="#" class="openChatBtn" data-name="${data.name}">💬 ${currentLang==='en'?'Text':'SMS'}</a>`:''}
+      ${data.contact?`<a href="tel:${data.contact}">📞 ${currentLang==='en'?'Call':'कॉल'}</a>`:''}
+      <a href="mailto:info@example.com">📧 Email</a>
+    </div>`
+  ];
+  modalContent.innerHTML=lines.join('');
+  infoModal.style.display='flex';
+  document.getElementById('closeModal').onclick=()=>infoModal.style.display='none';
+  infoModal.onclick=(e)=>{ if(e.target===infoModal) infoModal.style.display='none'; };
+}
+
+/* =========================
+   Sidebar + Handle
+========================= */
+const sidebar=document.getElementById('rightSidebar');
+const handle=document.getElementById('sidebarHandle');
+const brightnessBtn=document.getElementById('brightnessBtn');
+const brightnessPanel=document.getElementById('brightnessPanel');
+const brightnessSlider=document.getElementById('brightnessSlider');
+const soundBtn=document.getElementById('soundBtn');
+const soundPanel=document.getElementById('soundPanel');
+const soundSlider=document.getElementById('soundSlider');
+const notifBtn=document.getElementById('notifBtn');
+const helpBtn=document.getElementById('helpBtn');
+const recordBtn=document.getElementById('recordBtn');
+const weatherBtn=document.getElementById('weatherBtn');
+const weatherPanel=document.getElementById('weatherPanel');
+const helpWindow=document.getElementById('helpWindow');
+
+let notifOn=true, dragging=false, dragStartX=0;
+const openSidebar=()=>{sidebar.classList.add('open');handle.classList.add('docked');};
+const closeSidebar=()=>{sidebar.classList.remove('open');handle.classList.remove('docked');};
+
+handle.addEventListener('pointerdown',e=>{dragging=true;dragStartX=e.clientX;handle.setPointerCapture(e.pointerId);});
+handle.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-dragStartX;if(dx<-30)openSidebar();if(dx>30)closeSidebar();});
+handle.addEventListener('pointerup',e=>{handle.releasePointerCapture(e.pointerId);const dx=e.clientX-dragStartX;if(Math.abs(dx)<10){sidebar.classList.contains('open')?closeSidebar():openSidebar();}dragging=false;});
+
+brightnessBtn.onclick=()=>{openSidebar();const show=brightnessPanel.style.display!=='block';brightnessPanel.style.display=show?'block':'none';soundPanel.style.display='none';weatherPanel.style.display='none';};
+soundBtn.onclick=()=>{openSidebar();const show=soundPanel.style.display!=='block';soundPanel.style.display=show?'block':'none';brightnessPanel.style.display='none';weatherPanel.style.display='none';};
+notifBtn.onclick=()=>{openSidebar();notifOn=!notifOn;notifBtn.textContent=notifOn?`🔔 ${t('notifications_on')}`:`🔕 ${t('notifications_off')}`;notifBtn.classList.toggle('notif-off',!notifOn);notifBtn.setAttribute('aria-pressed',String(notifOn));};
+helpBtn.onclick=()=>{openSidebar();helpWindow.style.display=helpWindow.style.display==='block'?'none':'block';helpWindow.style.right='280px';helpWindow.style.top='80px';};
+recordBtn.onclick=()=>{openSidebar();alert(t('recordAlert'));};
+weatherBtn.onclick=()=>{openSidebar();const show=weatherPanel.style.display!=='block';weatherPanel.style.display=show?'block':'none';brightnessPanel.style.display='none';soundPanel.style.display='none';};
+
+brightnessSlider.addEventListener('input',()=>{appRoot.style.filter=`brightness(${brightnessSlider.value}%)`;});
+soundSlider.addEventListener('input',()=>{appRoot.style.opacity=0.8+(soundSlider.value/200);});
+
+/* =========================
+   Weather (manual search, multilingual random AI version)
+========================= */
+const wStatus=document.getElementById('weatherStatus');
+const wTemp=document.getElementById('weatherTemp');
+const wHum=document.getElementById('weatherHum');
+const wPlace=document.getElementById('weatherPlace');
+const wGo=document.getElementById('weatherGo');
+
+const WeatherAIResponses = {
+  en: ["Sunny ☀️", "Partially Cloudy ⛅", "Rainy 🌧️"],
+  hi: ["धूप ☀️", "आंशिक बादल ⛅", "बारिश 🌧️"],
+  te: ["ఎండ ☀️", "పాక్షిక మబ్బు ⛅", "వాన 🌧️"],
+  kn: ["ಬೆಚ್ಚಗಿನ ☀️", "ಭಾಗಶಃ ಮೋಡಗಳು ⛅", "ಮಳೆ 🌧️"],
+  ta: ["வெயில் ☀️", "பகுதி மேகமூட்டம் ⛅", "மழை 🌧️"],
+  bn: ["রোদ ☀️", "আংশিক মেঘলা ⛅", "বৃষ্টি 🌧️"]
+};
+function getRandomWeather() {
+  const set = WeatherAIResponses[currentLang] || WeatherAIResponses.en;
+  return set[Math.floor(Math.random()*set.length)];
+}
+wGo.onclick=()=>{
+  const place=wPlace.value.trim();
+  if(!place){
+    wStatus.textContent = currentLang==='en'?"Please enter a location":
+      currentLang==='hi'?"कृपया स्थान दर्ज करें":
+      currentLang==='te'?"దయచేసి ప్రదేశం ఇవ్వండి":
+      currentLang==='kn'?"ದಯವಿಟ್ಟು ಸ್ಥಳವನ್ನು ನಮೂದಿಸಿ":
+      currentLang==='ta'?"தயவுசெய்து இடத்தை உள்ளிடவும்":
+      "দয়া করে অবস্থান লিখুন";
+    wTemp.textContent='--°C'; wHum.textContent='--% RH';
+    return;
+  }
+  wStatus.textContent=getRandomWeather();
+  wTemp.textContent= `${28+Math.floor(Math.random()*6)}°C`;
+  wHum.textContent= `${40+Math.floor(Math.random()*40)}% RH`;
+};
+
+/* =========================
+   AI Price Suggestion
+========================= */
+function showPriceHint(){
+  const prod=farmerProduct.value.trim(), loc=farmerLocation.value.trim();
+  if(!prod||!loc){ priceHint.innerHTML=`<span>${t('priceNoData')}</span>`; return; }
+  const entry=PRICE_TABLE[prod] && PRICE_TABLE[prod][loc];
+  if(entry){
+    priceHint.innerHTML=`<span>${t('priceHint')
+      .replace('{loc}', translateValue(loc))
+      .replace('{prod}', translateValue(prod))
+      .replace('{min}', entry[0]).replace('{max}', entry[1])}</span>`;
+  }else{
+    priceHint.innerHTML=`<span>${t('priceNoData')}</span>`;
+  }
+}
+farmerProduct.addEventListener('input',showPriceHint);
+farmerLocation.addEventListener('input',showPriceHint);
+
+/* =========================
+   Profit Calculator (auto-detect mode)
+========================= */
+const calcModal=document.getElementById('calcModal');
+const openCalcFarmer=document.getElementById('openCalcFarmer');
+const openCalcBuyer=document.getElementById('openCalcBuyer');
+const closeCalc=document.getElementById('closeCalc');
+const doCalc=document.getElementById('doCalc');
+const calcCost=document.getElementById('calcCost');
+const calcPrice=document.getElementById('calcPrice');
+const calcQty=document.getElementById('calcQty');
+const calcResult=document.getElementById('calcResult');
+let calcMode='farmer'; // 'farmer' or 'buyer'
+
+function setupCalc(mode){
+  calcMode=mode;
+  document.getElementById('calcTitle').textContent = mode==='farmer'? t('calcTitleFarmer') : t('calcTitleBuyer');
+  calcCost.placeholder = mode==='farmer'? t('calcCostFarmer') : t('calcCostBuyer');
+  calcPrice.placeholder = t('calcPrice');
+  calcQty.placeholder = t('calcQty');
+  doCalc.textContent = t('calcGo');
+  calcCost.value=''; calcPrice.value=''; calcQty.value=''; calcResult.innerHTML='';
+}
+
+openCalcFarmer.onclick=()=>{ setupCalc('farmer'); calcModal.style.display='flex'; };
+openCalcBuyer.onclick=()=>{ setupCalc('buyer'); calcModal.style.display='flex'; };
+closeCalc.onclick=()=>{ calcModal.style.display='none'; };
+calcModal.onclick=(e)=>{ if(e.target===calcModal) calcModal.style.display='none'; };
+
+doCalc.onclick=()=>{
+  const c=parseFloat(calcCost.value)||0; // cost or buying
+  const s=parseFloat(calcPrice.value)||0; // selling
+  const q=parseFloat(calcQty.value)||0;
+  const profit=Math.max(0,(s-c))*q;
+  const margin=(s>0)? Math.max(0,((s-c)/s)*100):0;
+  calcResult.innerHTML=`<span>${t('calcRes').replace('{profit}',profit.toFixed(2)).replace('{margin}',margin.toFixed(1))}</span>`;
+};
+
+/* =========================
+   Language Apply (UI + new features)
+========================= */
+function applyUI(){
+  document.getElementById('title').textContent=t('title');
+  document.getElementById('tagline').textContent=t('tagline');
+  btnFarmers.textContent=t('farmerBtn'); btnBuyers.textContent=t('buyerBtn');
+  toggleFarmerForm.textContent=t('addProduct'); document.getElementById('farmerFormTitle').textContent=t('farmerForm');
+  addFarmerBtn.textContent=t('addProductSubmit');
+  toggleBuyerForm.textContent=t('addRequirement'); document.getElementById('buyerFormTitle').textContent=t('buyerForm');
+  addBuyerBtn.textContent=t('addRequirementSubmit');
+
+  buyerReqQuery.placeholder=t('searchBuyer'); buyerLocQuery.placeholder=t('searchByLocation');
+  farmerProdQuery.placeholder=t('searchFarmer'); farmerLocQuery.placeholder=t('searchByLocation');
+  document.getElementById('backFromFarmer').textContent=t('back');
+  document.getElementById('backFromBuyer').textContent=t('back');
+  document.getElementById('footerText').textContent=t('footer');
+
+  // Availability captions
+  const avail=document.getElementById('availability').options;
+  avail[0].textContent=lookup(DATA.status,"Available"); avail[1].textContent=lookup(DATA.status,"Out of Stock");
+  const availB=document.getElementById('availabilityBuyer').options;
+  availB[0].textContent=lookup(DATA.status,"Active"); availB[1].textContent=lookup(DATA.status,"Inactive");
+
+  // Sidebar labels
+  brightnessBtn.textContent=`☀️ ${t('brightness')}`;
+  soundBtn.textContent=`🔊 ${t('sound')}`;
+  notifBtn.textContent=(notifOn?`🔔 ${t('notifications_on')}`:`🔕 ${t('notifications_off')}`);
+  weatherBtn.textContent=`🌦 ${t('weather')}`;
+  helpBtn.textContent=`❓ ${t('help')}`;
+  recordBtn.textContent=`🎥 ${t('record')}`;
+
+  // Weather placeholders
+  wPlace.placeholder=t('searchByLocation');
+  wStatus.textContent=t('weatherWaiting');
+  wTemp.textContent='--°C'; wHum.textContent='--% RH';
+  wGo.textContent='Go';
+
+  // Help content
+  document.getElementById('helpTitle').textContent=t('helpTitle');
+  const ul=document.getElementById('helpList'); ul.innerHTML='';
+  i18n[currentLang].helpList.forEach(item=>{ const li=document.createElement('li'); li.innerHTML=item; ul.appendChild(li); });
+
+  // Chatbot UI
+  document.getElementById('chatTitle').textContent=t('chatbotTitle');
+  document.getElementById('chatInput').placeholder=t('chatbotPlaceholder');
+  document.getElementById('chatSend').textContent=t('chatbotSend');
+
+  // Update lists to reflect translated labels/values
+  renderBuyerCards(); renderFarmerCards();
+  showPriceHint();
+}
+
+/* Language switcher */
+const langBtn=document.getElementById('langBtn');
+const langPanel=document.getElementById('langPanel');
+langBtn.addEventListener('click',(e)=>{e.stopPropagation();langPanel.style.display=langPanel.style.display==='block'?'none':'block';});
+document.addEventListener('click',(e)=>{ if(!langPanel.contains(e.target)&&e.target!==langBtn) langPanel.style.display='none'; });
+document.querySelectorAll('#langPanel [data-lang]').forEach(btn=>{
+  btn.addEventListener('click',()=>{ currentLang=btn.dataset.lang||'en'; langPanel.style.display='none'; applyUI(); });
+});
+
+/* =========================
+   Chatbot (offline, context-aware, multilingual)
+========================= */
+const chatFab=document.getElementById('chatFab');
+const chatPanel=document.getElementById('chatPanel');
+const chatClose=document.getElementById('chatClose');
+const chatBody=document.getElementById('chatBody');
+const chatInput=document.getElementById('chatInput');
+const chatSend=document.getElementById('chatSend');
+
+let chatHistory=[]; // keep last few messages for context
+function pushMe(txt){ const d=document.createElement('div'); d.className='msg me'; d.textContent=txt; chatBody.appendChild(d); chatBody.scrollTop=chatBody.scrollHeight; }
+function pushBot(txt){ const d=document.createElement('div'); d.className='msg bot'; d.textContent=txt; chatBody.appendChild(d); chatBody.scrollTop=chatBody.scrollHeight; }
+
+chatFab.onclick=()=>{ chatPanel.style.display='block'; if(!chatBody.dataset.init){ pushBot(t('chatHello')); chatBody.dataset.init='1'; } };
+chatClose.onclick=()=>{ chatPanel.style.display='none'; };
+chatSend.onclick=sendMsg;
+chatInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter') sendMsg(); });
+
+function detectIntent(text){
+  const low=text.toLowerCase();
+  const intents=[];
+  if(/price|rate|cost|कीमत|ధర|ಬೆಲೆ|விலை|দাম/.test(low)) intents.push('price');
+  if(/irrigation|watering|सिंचाई|నీటిపారుదల|ನೀರಾವರಿ|பாசனம்|সেচ/.test(low)) intents.push('irrigation');
+  if(/fertilizer|compost|उर्वरक|ఎరువు|ಗೊಬ್ಬರ|உரம்|সার/.test(low)) intents.push('fertilizer');
+  if(/disease|pest|curl|blight|मिल्ड्यू|रोग|किट|పురుగు|రోగం|রোগ/.test(low)) intents.push('disease');
+  if(/harvest|storage|transport|कटाई|కోత|ಕೊಯ್ಲು|அறுவடை|কাটা/.test(low)) intents.push('harvest');
+  if(/scheme|kisan|loan|योजना|పథకం|ಯೋಜನೆ|திட்டம்|স্কিম/.test(low)) intents.push('schemes');
+  if(/weather|rain|humidity|मौसम|వాతావరణం|ಹವಾಮಾನ|வானிலை|আবহাওয়া/.test(low)) intents.push('weather');
+  if(/help|how|use|कैसे|ఎలా|ಹೇಗೆ|எப்படி|কিভাবে/.test(low)) intents.push('help');
+  return intents.length?intents:['tip'];
+}
+function extractEntities(text){
+  const allProds=Object.keys(DATA.products.en);
+  const allLocs=Object.keys(DATA.locations.en);
+  let product=null, location=null;
+  const wordset=text.toLowerCase();
+  const mapProd=i18nMapReverse(DATA.products);
+  const mapLoc=i18nMapReverse(DATA.locations);
+  for(const p of [...allProds, ...Object.keys(mapProd)]){
+    if(wordset.includes(p.toLowerCase())) { product = mapProd[p]||p; break; }
+  }
+  for(const l of [...allLocs, ...Object.keys(mapLoc)]){
+    if(wordset.includes(l.toLowerCase())) { location = mapLoc[l]||l; break; }
+  }
+  return {product, location};
+}
+function i18nMapReverse(dict){
+  const res={}; const loc=dict[currentLang]||{}, eng=dict.en||{};
+  for(const k in eng){ if(loc[k]) res[loc[k].toLowerCase()]=k; }
+  return res;
+}
+
+function generateReply(userMsg){
+  const intents=detectIntent(userMsg);
+  const {product,location}=extractEntities(userMsg);
+  const hasContext=chatHistory.slice(-3).map(x=>x.user).join(' ').length>0;
+  const parts=[];
+  if(hasContext) parts.push(t('chatContextJoiner'));
+
+  intents.forEach(intent=>{
+    switch(intent){
+      case 'price':
+        if(product && location){
+          const band = PRICE_TABLE[product] && PRICE_TABLE[product][location];
+          if(band){
+            parts.push(`${translateValue(product)} • ${translateValue(location)} → ₹${band[0]}–₹${band[1]} (${t('priceHint').replace('{loc}', translateValue(location)).replace('{prod}', translateValue(product)).replace('₹{min}', band[0]).replace('₹{max}', band[1])})`);
+          }else{
+            parts.push(t('chatPrice'));
+          }
+        } else {
+          parts.push(t('chatPrice'), t('chatAskClarify'));
+        }
+        break;
+      case 'irrigation': parts.push(t('chatIrrigation')); break;
+      case 'fertilizer': parts.push(t('chatFertilizer')); break;
+      case 'disease': parts.push(t('chatDisease')); break;
+      case 'harvest': parts.push(t('chatHarvest')); break;
+      case 'schemes': parts.push(t('chatSchemes')); break;
+      case 'weather': parts.push(t('chatWeatherUse')); break;
+      case 'help': parts.push(t('chatHello')); break;
+      default: parts.push(t('chatTipGeneric'));
+    }
+  });
+
+  if(/\d+\s?(kg|ton|tons|किलो|టన్ను|ಟನ್|டன்|টন)/i.test(userMsg)) parts.push(t('chatTipGeneric'));
+  return parts.join('\n\n');
+}
+
+function sendMsg(){
+  const txt=chatInput.value.trim(); if(!txt) return;
+  pushMe(txt); chatInput.value='';
+  chatHistory.push({user:txt});
+  const reply=generateReply(txt);
+  pushBot(reply);
+  chatHistory.push({bot:reply});
+}
+
+/* =========================
+   Initial Render
+========================= */
+renderBuyerCards();
+renderFarmerCards();
+applyUI(); // default EN
+
+
+/* ===========================================================
+   ===== NEW: In-page WhatsApp-style texting window logic =====
+   (Improved — only opens when clicked, popup stays open,
+   and smart sequential replies)
+=========================================================== */
+
+const waChatWindow = document.getElementById('waChatWindow');
+const waUser = document.getElementById('waChatUser');
+const waClose = document.getElementById('waChatClose');
+const waMsgs = document.getElementById('waChatMessages');
+const waInput = document.getElementById('waChatInput');
+const waSend = document.getElementById('waChatSend');
+
+let waCurrent = null;
+const waThreads = {}; // Store conversations by contact
+const waReplyStages = {}; // Track reply order for each contact
+
+// Hide chat by default
+waChatWindow.style.display = 'none';
+
+function waOpen(name) {
+  waCurrent = name || 'Chat';
+  waUser.textContent = waCurrent;
+  waChatWindow.style.display = 'flex';
+  waRender();
+}
+
+function waCloseWindow() {
+  waChatWindow.style.display = 'none';
+  waCurrent = null;
+}
+waClose.onclick = waCloseWindow;
+
+function waRender() {
+  waMsgs.innerHTML = '';
+  const arr = waThreads[waCurrent] || [];
+  for (const m of arr) {
+    const div = document.createElement('div');
+    div.className = 'waMsg ' + (m.from === 'me' ? 'waMe' : 'waThem');
+    div.innerHTML = `${m.text}<span class="waTime">${m.t.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    })}</span>`;
+    waMsgs.appendChild(div);
+  }
+  waMsgs.scrollTop = waMsgs.scrollHeight;
+}
+
+function waSendMsg() {
+  const txt = (waInput.value || '').trim();
+  if (!txt || !waCurrent) return;
+  (waThreads[waCurrent] = waThreads[waCurrent] || []).push({
+    from: 'me',
+    text: txt,
+    t: new Date()
+  });
+  waInput.value = '';
+  waRender();
+
+  // Determine reply stage for this contact
+  const stage = (waReplyStages[waCurrent] || 0) + 1;
+  waReplyStages[waCurrent] = stage;
+
+  // Choose reply based on message count
+  let replyText = 'Thank you.';
+  if (stage === 1) replyText = 'Hello.';
+  else if (stage === 2) replyText = 'Nice to know about you, I will.';
+  else if (stage === 3) replyText = 'Hmm, I will think about it.';
+
+  setTimeout(() => {
+    (waThreads[waCurrent] = waThreads[waCurrent] || []).push({
+      from: 'them',
+      text: replyText,
+      t: new Date()
+    });
+    waRender();
+  }, 700);
+}
+
+waSend.onclick = waSendMsg;
+waInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') waSendMsg();
+});
+
+// Click on "💬 Text" button — open chat without closing popup
+document.addEventListener('click', (e) => {
+  const el = e.target;
+  if (el && el.classList && el.classList.contains('openChatBtn')) {
+    e.preventDefault();
+    const name = el.getAttribute('data-name') || 'Chat';
+    waOpen(name);
+    // Keep popup visible (no infoModal hide here)
+  }
+});
+
+/* 🌾 Nearby Agro & Industry Service Finder */
+const servicePopup = document.getElementById('servicePopup');
+const serviceCard = document.getElementById('serviceCard');
+const serviceClose = document.getElementById('serviceClose');
+const serviceBtn = document.getElementById('footerServiceBtn');
+const serviceTitle = document.getElementById('serviceTitle');
+const serviceFooterText = document.getElementById('serviceFooterText');
+const serviceFind = document.getElementById('serviceFind');
+const serviceLoc = document.getElementById('serviceLocation');
+const serviceType = document.getElementById('serviceType');
+const serviceResults = document.getElementById('serviceResults');
+
+serviceBtn.onclick = () => {
+  servicePopup.style.display = 'block';
+  applyServiceLang(); // apply translations
+};
+serviceClose.onclick = () => servicePopup.style.display = 'none';
+servicePopup.onclick = (e) => {
+  if (e.target === servicePopup) servicePopup.style.display = 'none';
+};
+
+// Random demo results generator
+function generateServices(loc, type) {
+  const names = [
+    "GreenGrow Fertilizers","Sai Machinery Rentals","Balaji Transport Co.",
+    "FreshPack Cold Storage","Sri Durga Repair Works","AgroMate Suppliers",
+    "Shakti Seeds","Nandi Agro Equipment","EcoPack Industries","Om Logistics"
+  ];
+  const types = {
+    fertilizer:"🌾 Fertilizer Shop",
+    seed:"🌱 Seed Supplier",
+    machinery:"⚙️ Machinery Rental",
+    transport:"🚛 Transporter",
+    packaging:"📦 Packaging / Cold Storage",
+    repair:"🔧 Repair Workshop",
+    raw:"🧰 Raw Material Dealer",
+    vet:"🐄 Veterinary / Maintenance"
+  };
+  const results = [];
+  for (let i=0;i<4+Math.floor(Math.random()*3);i++){
+    const name = names[Math.floor(Math.random()*names.length)];
+    const dist = (1+Math.random()*7).toFixed(1);
+    const t = (type==='all') ? Object.values(types)[Math.floor(Math.random()*8)] : types[type];
+    results.push(`${t} • ${name} – ${dist} km`);
+  }
+  return results;
+}
+
+serviceFind.onclick = () => {
+  const loc = serviceLoc.value.trim() || 'your area';
+  const type = serviceType.value;
+  const results = generateServices(loc, type);
+  serviceResults.innerHTML = results.map(r=>`<div class="serviceItem">${r}</div>`).join('');
+};
+
+// Multilingual integration
+function applyServiceLang(){
+  const L = i18n[currentLang];
+  serviceTitle.textContent = (currentLang==='en')?"🚜 Nearby Agro & Industry Services":
+    currentLang==='hi'?"🚜 आस-पास की कृषि व औद्योगिक सेवाएँ":
+    currentLang==='te'?"🚜 సమీప వ్యవసాయ & పరిశ్రమ సేవలు":
+    currentLang==='kn'?"🚜 ಹತ್ತಿರದ ಕೃಷಿ ಮತ್ತು ಕೈಗಾರಿಕಾ ಸೇವೆಗಳು":
+    currentLang==='ta'?"🚜 அருகிலுள்ள வேளாண் & தொழில் சேவைகள்":
+    "🚜 নিকটবর্তী কৃষি ও শিল্প পরিষেবা";
+  serviceFooterText.textContent = serviceTitle.textContent.replace("🚜 ","");
+  serviceLoc.placeholder = (currentLang==='en')?"Enter location or pincode":
+    currentLang==='hi'?"स्थान या पिनकोड दर्ज करें":
+    currentLang==='te'?"ప్రాంతం లేదా పిన్‌కోడ్ ఇవ్వండి":
+    currentLang==='kn'?"ಸ್ಥಳ ಅಥವಾ ಪಿನ್‌ಕೋಡ್ ನಮೂದಿಸಿ":
+    currentLang==='ta'?"இடம் அல்லது பின் குறியீட்டை உள்ளிடவும்":
+    "অবস্থান বা পিনকোড লিখুন";
+  serviceFind.textContent = (currentLang==='en')?"Find Services":
+    currentLang==='hi'?"सेवाएँ खोजें":
+    currentLang==='te'?"సేవలను కనుగొనండి":
+    currentLang==='kn'?"ಸೇವೆಗಳು ಹುಡುಕಿ":
+    currentLang==='ta'?"சேவைகளை காண்க":
+    "পরিষেবা খুঁজুন";
+}
+
+
+</script>
+<!-- 🌾 Nearby Agro & Industry Service Finder -->
+<div id="servicePopup">
+  <div id="serviceCard">
+    <div id="serviceHeader">
+      <span id="serviceTitle">🚜 Nearby Agro & Industry Services</span>
+      <button id="serviceClose" class="btn" style="background:rgba(255,255,255,.2);color:#fff;">✖</button>
+    </div>
+    <div id="serviceBody">
+      <input id="serviceLocation" placeholder="Enter location or pincode">
+      <select id="serviceType">
+        <option value="all">All Services</option>
+        <option value="fertilizer">Fertilizer Shop</option>
+        <option value="seed">Seed Supplier</option>
+        <option value="machinery">Machinery Rental</option>
+        <option value="transport">Transporter</option>
+        <option value="packaging">Packaging / Cold Storage</option>
+        <option value="repair">Repair Workshop</option>
+        <option value="raw">Raw Material Dealer</option>
+        <option value="vet">Veterinary / Maintenance</option>
+      </select>
+      <button id="serviceFind" class="btn">Find Services</button>
+      <div id="serviceResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Button under footer -->
+<div id="footerServiceBtn">
+  🚜 <span id="serviceFooterText">Find Nearby Agro & Industry Services</span>
+</div>
 
 <script>
-// Existing JS from your working version stays the same
+window.onload = () => {
+  const servicePopup = document.getElementById('servicePopup');
+  const serviceClose = document.getElementById('serviceClose');
+  const serviceBtn = document.getElementById('footerServiceBtn');
+  const serviceTitle = document.getElementById('serviceTitle');
+  const serviceFooterText = document.getElementById('serviceFooterText');
+  const serviceFind = document.getElementById('serviceFind');
+  const serviceLoc = document.getElementById('serviceLocation');
+  const serviceType = document.getElementById('serviceType');
+  const serviceResults = document.getElementById('serviceResults');
+
+  // 🌾 Open popup when footer button clicked
+  serviceBtn.onclick = () => {
+    servicePopup.style.display = 'block';
+    applyServiceLang(); // reuse multilingual function
+  };
+
+  serviceClose.onclick = () => (servicePopup.style.display = 'none');
+  servicePopup.onclick = (e) => {
+    if (e.target === servicePopup) servicePopup.style.display = 'none';
+  };
+
+  // Random demo results generator
+  function generateServices(loc, type) {
+    const names = [
+      "GreenGrow Fertilizers","Sai Machinery Rentals","Balaji Transport Co.",
+      "FreshPack Cold Storage","Sri Durga Repair Works","AgroMate Suppliers",
+      "Shakti Seeds","Nandi Agro Equipment","EcoPack Industries","Om Logistics"
+    ];
+    const types = {
+      fertilizer:"🌾 Fertilizer Shop",
+      seed:"🌱 Seed Supplier",
+      machinery:"⚙️ Machinery Rental",
+      transport:"🚛 Transporter",
+      packaging:"📦 Packaging / Cold Storage",
+      repair:"🔧 Repair Workshop",
+      raw:"🧰 Raw Material Dealer",
+      vet:"🐄 Veterinary / Maintenance"
+    };
+    const results = [];
+    for (let i=0;i<4+Math.floor(Math.random()*3);i++){
+      const name = names[Math.floor(Math.random()*names.length)];
+      const dist = (1+Math.random()*7).toFixed(1);
+      const t = (type==='all') ? Object.values(types)[Math.floor(Math.random()*8)] : types[type];
+      results.push(`${t} • ${name} – ${dist} km`);
+    }
+    return results;
+  }
+
+  serviceFind.onclick = () => {
+    const loc = serviceLoc.value.trim() || 'your area';
+    const type = serviceType.value;
+    const results = generateServices(loc, type);
+    serviceResults.innerHTML = results.map(r=>`<div class="serviceItem">${r}</div>`).join('');
+  };
+
+  /* ===== Loader fade-out (keeps desktop unchanged, helps mobile) ===== */
+  const loader = document.getElementById('appLoader');
+  setTimeout(()=>{ loader.classList.add('hide');}, 450);
+};
 </script>
+
+<!-- ======== 🌾 NEW FEATURES ADD-ON ======== -->
+<!-- Footer buttons -->
+<div id="footerDetectBtn" style="margin:6px;display:inline-block;padding:0.6rem 1rem;border-radius:20px;background:rgba(255,255,255,0.15);color:#fff;font-weight:700;cursor:pointer;">🧬 Crop Disease & Pest Detector</div>
+<div id="footerCalendarBtn" style="margin:6px;display:inline-block;padding:0.6rem 1rem;border-radius:20px;background:rgba(255,255,255,0.15);color:#fff;font-weight:700;cursor:pointer;">📅 Calendar Planner</div>
+
+<!-- 🧬 Crop Disease & Pest Detector Popup -->
+<div id="detectPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:999;">
+  <div style="background:#fff;color:#333;border-radius:16px;padding:20px;width:min(90%,480px);box-shadow:0 10px 30px rgba(0,0,0,.3);">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3>🧬 Crop Disease & Pest Detector (AI)</h3>
+      <button id="detectClose" class="btn">✖</button>
+    </div>
+    <input type="file" id="detectInput" accept="image/*" style="margin-top:10px;">
+    <img id="detectPreview" style="max-width:100%;margin-top:10px;border-radius:10px;">
+    <div id="detectResult" style="margin-top:12px;font-weight:700;text-align:left;"></div>
+  </div>
+</div>
+
+<!-- 📅 Calendar Planner Popup -->
+<div id="calendarPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:999;">
+  <div style="background:#fff;color:#333;border-radius:16px;padding:20px;width:min(95%,620px);box-shadow:0 10px 30px rgba(0,0,0,.3);">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3>📅 Calendar Planner</h3>
+      <button id="calendarClose" class="btn">✖</button>
+    </div>
+    <select id="calendarRole" style="margin:10px 0;padding:8px;border-radius:10px;width:100%;">
+      <option value="">Select Role</option>
+      <option value="farmer">Farmer</option>
+      <option value="industrialist">Small-Scale Industrialist</option>
+      <option value="wholesaler">Wholesaler</option>
+    </select>
+    <div id="calendarGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:8px;"></div>
+    <div id="calendarNote" style="margin-top:10px;font-size:0.9rem;text-align:left;max-height:200px;overflow:auto;"></div>
+  </div>
+</div>
+
+<script>
+/* === 🧬 Crop Disease Detector === */
+const detectBtn=document.getElementById('footerDetectBtn');
+const detectPopup=document.getElementById('detectPopup');
+const detectClose=document.getElementById('detectClose');
+const detectInput=document.getElementById('detectInput');
+const detectPreview=document.getElementById('detectPreview');
+const detectResult=document.getElementById('detectResult');
+detectBtn.onclick=()=>{detectPopup.style.display='flex';detectResult.textContent='';detectInput.value='';detectPreview.src='';};
+detectClose.onclick=()=>detectPopup.style.display='none';
+detectPopup.onclick=(e)=>{if(e.target===detectPopup)detectPopup.style.display='none';};
+detectInput.onchange=e=>{
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    detectPreview.src=reader.result;
+    const results=[
+      "✅ Healthy crop — no visible disease or pest.",
+      "⚠️ Early Blight detected — spray Mancozeb 0.25%.",
+      "🐛 Aphid attack — use neem oil spray.",
+      "🍂 Fungal spots — prune infected leaves.",
+      "🚨 Powdery mildew signs — apply sulfur dust."
+    ];
+    detectResult.textContent="Analyzing image...";
+    setTimeout(()=>detectResult.textContent=results[Math.floor(Math.random()*results.length)],1200);
+  };
+  reader.readAsDataURL(file);
+};
+
+/* === 📅 Calendar Planner === */
+const calBtn=document.getElementById('footerCalendarBtn');
+const calPopup=document.getElementById('calendarPopup');
+const calClose=document.getElementById('calendarClose');
+const calGrid=document.getElementById('calendarGrid');
+const calNote=document.getElementById('calendarNote');
+const calRole=document.getElementById('calendarRole');
+calBtn.onclick=()=>{calPopup.style.display='flex';buildCalendar();};
+calClose.onclick=()=>calPopup.style.display='none';
+calPopup.onclick=(e)=>{if(e.target===calPopup)calPopup.style.display='none';};
+
+function buildCalendar(){
+  const now=new Date();const y=now.getFullYear(),m=now.getMonth();const dmax=new Date(y,m+1,0).getDate();
+  calGrid.innerHTML='';calNote.textContent='Click on a date to record or view notes.';
+  for(let d=1;d<=dmax;d++){
+    const el=document.createElement('div');
+    el.textContent=d;el.style.cssText="padding:10px;border-radius:8px;background:#f3f3f3;cursor:pointer;text-align:center;";
+    el.onclick=()=>selectDate(d,m,y);
+    calGrid.appendChild(el);
+  }
+}
+const tasks={};
+function selectDate(day,mon,year){
+  const key=`${year}-${mon}-${day}`;
+  const t=prompt("Enter what you did or plan to do:");
+  if(t){tasks[key]=t;calNote.innerHTML=`<b>${day}/${mon+1}/${year}:</b> ${t}<br><br>💡 Suggestion: ${suggest(calRole.value)}`;}
+  else if(tasks[key])calNote.innerHTML=`<b>${day}/${mon+1}/${year}:</b> ${tasks[key]}`;
+}
+function suggest(role){
+  const w=["Sunny","Rainy","Cloudy"][Math.floor(Math.random()*3)];
+  if(role==="farmer"){
+    if(w==="Rainy")return"Postpone pesticide spraying; plan drainage.";
+    if(w==="Sunny")return"Good day for harvesting or drying produce.";
+    return"Monitor soil moisture, light irrigation advised.";
+  }
+  if(role==="industrialist"){
+    if(w==="Rainy")return"Keep raw materials dry; check equipment insulation.";
+    if(w==="Sunny")return"Best day for machinery service.";
+    return"Plan packaging and QC checks.";
+  }
+  if(role==="wholesaler"){
+    if(w==="Rainy")return"Plan indoor logistics; avoid long shipments.";
+    if(w==="Sunny")return"Transport and bulk supply favorable.";
+    return"Check demand and schedule client calls.";
+  }
+  return"Have a productive day!";
+}
+</script>
+<!-- ======== END NEW FEATURES ======== -->
+
 </body>
 </html>
